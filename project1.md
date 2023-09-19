@@ -119,6 +119,13 @@ step evaluation rules would look for this language:
    the big step semantics defined above, and not call reduce. If evaluation is not possible
    it should throw `TermIsStuck` exception containing corresponding stuck term.
 
+1. Implement the `programVSmallerThan3` method. It must return a (constant) string that
+   represents a program. The program receives `v` as "input", and must evaluate to `True`
+   if `v < 3` and `False` otherwise. `v` is guaranteed to be a numeric value.
+
+1. (for further thought:) can you implement a program that tests whether `v` is even?
+   If not, why not?
+
 All of these are given with stubbed `???` body. `???` is used to indicated unimplemented
 parts of code in Scala.
 
