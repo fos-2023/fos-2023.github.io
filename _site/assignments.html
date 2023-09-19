@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Foundations of Software</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <a href="index.html"><h1>Foundations of Software</h1></a>
+        
+          
+        
+          
+            <p><a href="staff.html">Staff</a></p>
+          
+        
+          
+            <p><a href="documents.html">Documents</a></p>
+          
+        
+          
+            <p><a href="assignments.html">Assignments</a></p>
+          
+        
+          
+            <p><a href="project1.html">Project 1 - The NB Language</a></p>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </header>
+      <section>
+        <h3 id="administrivia">Administrivia</h3>
+
+<p>Over the course of the semester, we will post five assignments that will require you to code up five moderately complex Scala applications (one per each assignment) that highlight certain theoretical aspects of the course.</p>
+
+<p>Every assignment will become available on this website at due time (usually after the deadline of the previous assignment).</p>
+
+<h3 id="team-registration">Team Registration</h3>
+
+<p>We encourage you to team up when working on assignments.
+Teams can consist of one, two or three students and cannot intersect with each other.
+It is okay to share ideas between teams, but sharing code is prohibited.</p>
+
+<h3 id="getting-started-with-scala">Getting started with Scala</h3>
+
+<p>All development during the course will be done in Scala.
+Here we provide the instructions how to setup the Scala development tools.</p>
+
+<p>First, you need to install <a href="http://www.scala-sbt.org/download.html">the sbt build tool</a>.
+See the instructions for installing JVM, Scala and SBT <a href="https://gitlab.epfl.ch/lamp/cs206/-/blob/master/labs/tools-setup.md#step-2-installing-the-java-development-kit-jdk-and-sbt-via-coursier">here</a>.
+For each assignment, you can run <code class="language-plaintext highlighter-rouge">sbt compile</code> and <code class="language-plaintext highlighter-rouge">sbt run</code> in the console to compile and run the project.
+Running <code class="language-plaintext highlighter-rouge">sbt</code> will start an interactive SBT session, after which you can repeatedly compile the project faster compared to running <code class="language-plaintext highlighter-rouge">sbt compile</code> each time.</p>
+
+<p>We recommend using <a href="https://code.visualstudio.com/">VS Code</a> with the <a href="https://marketplace.visualstudio.com/items?itemName=scalameta.metals">Metals</a> extension for development.
+You can find instructions for installing VS Code <a href="https://gitlab.epfl.ch/lamp/cs206/-/blob/master/labs/tools-setup.md#step-6-installing-code">here</a>.
+You will need to make sure you have installed JVM version 11 or 17, after which it suffices to install Metals and open the assignment directory in VS Code.
+VS Code will allow you to use Scala worksheets, which will let you test and interact with your solutions much more easily.</p>
+
+<p>You can also use <a href="https://www.jetbrains.com/idea/download">IntelliJ IDEA</a> for development.
+You can import the project into the IDE:</p>
+
+<ol>
+  <li>Click <code class="language-plaintext highlighter-rouge">Import Project</code>.</li>
+  <li>Select the directory where you unpacked the assignment.</li>
+  <li>Click <code class="language-plaintext highlighter-rouge">Open</code>.</li>
+  <li>Select <code class="language-plaintext highlighter-rouge">Import project from external model &gt; SBT</code>, click <code class="language-plaintext highlighter-rouge">Next</code>.</li>
+  <li>Click <code class="language-plaintext highlighter-rouge">Finish</code>.</li>
+</ol>
+
+<p>If you don’t like IntelliJ IDEA, feel free to use alternative editors or even develop in the console,
+as long as your project passes our tests.</p>
+
+<h3 id="submitting-your-solutions">Submitting your solutions</h3>
+
+<ol>
+  <li>Send your project to the grading bot. You can do so by running the <code class="language-plaintext highlighter-rouge">submit.py</code> script in the project directory, or manually by following the steps you can find a bit below.</li>
+  <li>
+    <p>Wait for a response from the grading bot. You should receive <em>two</em>
+responses - first one indicates that your email has reached the bot’s inbox and
+so got past Google’s anti-virus. Second response will either contain a rejection
+notice along with the detailed error message or an acceptance notice with the
+results of running your submission against our test suite. The bot should
+normally respond in less than five minutes, although depending on the current
+load it could take longer.</p>
+  </li>
+  <li>
+    <p>If you don’t receive a response from the bot, or you get your submission rejected without a good reason, contact the staff.</p>
+  </li>
+  <li>If you’re not content with your results, follow the instructions in the reply email to try and improve your score. You can retry the submission as many times as you want before the deadline hits, and that won’t result in any penalties to your final score.</li>
+</ol>
+
+<h4 id="submitting-manually">Submitting manually</h4>
+
+<ol>
+  <li>Zip the <code class="language-plaintext highlighter-rouge">src</code> directory, making sure that:
+    <ul>
+      <li>you haven’t created or removed any files from the provided template for the corresponding project. For instance, if the template contained files Arithmetic.scala and Terms.scala in /src/main/scala/fos, don’t move these files around or create additional helper files.</li>
+      <li>you don’t zip any other directory, in particular the <code class="language-plaintext highlighter-rouge">target</code> directory, which contains binary files that might trip Google’s anti-virus.</li>
+    </ul>
+  </li>
+  <li>Send the archive produced during the previous step to grading bot’s email address: <a href="mailto:lamp.fos.bot@gmail.com">lamp.fos.bot@gmail.com</a>
+    <ul>
+      <li>The subject of the email should be “Project X (YYYYYY, ZZZZZZ, …)”, where X is the number of the project, and YYYYYY/ZZZZZZ/… are SCIPER numbers of the authors.</li>
+      <li>The body of the email doesn’t matter, because our grading bot can’t read.</li>
+      <li>Don’t forget the attachment.</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="late-submissions">Late submissions</h3>
+
+<p>If you miss a deadline, you can still submit your project, however your grade will be reduced. Late submissions will be graded with 30% deduction of points for every day after the deadline.</p>
+
+<!-- ### Feedback on submissions -->
+
+<!-- If you need more detailed feedback on your submission, please send an email to -->
+<!-- one of the assistants to reserve an office slot, so that we may study your code -->
+<!-- together. -->
+
+<h3 id="faq">FAQ</h3>
+
+<p>In case of error, please check the following list:</p>
+
+<ol>
+  <li>You need to submit assignments using your <em>EPFL email address</em>.</li>
+  <li>Make sure your email is not encrypted.</li>
+</ol>
+
+      </section>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+  </body>
+</html>
