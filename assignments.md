@@ -29,7 +29,7 @@ Running `sbt` will start an interactive SBT session, after which you can repeate
 
 We recommend using [VS Code](https://code.visualstudio.com/) with the [Metals](https://marketplace.visualstudio.com/items?itemName=scalameta.metals) extension for development.
 You can find instructions for installing VS Code [here](https://gitlab.epfl.ch/lamp/cs206/-/blob/master/labs/tools-setup.md#step-6-installing-code).
-You will need to make sure you have installed JVM version 11 or 17, after which it suffices to install Metals and open the assignment directory in VS Code.
+You will need to make sure you have installed JVM __version 11 or 17__, after which it suffices to install Metals and open the assignment directory in VS Code.
 VS Code will allow you to use Scala worksheets, which will let you test and interact with your solutions much more easily.
 
 You can also use [IntelliJ IDEA](https://www.jetbrains.com/idea/download) for development.
@@ -46,28 +46,16 @@ as long as your project passes our tests.
 
 ### Submitting your solutions
 
-1. Send your project to the grading bot. You can do so by running the `submit.py` script in the project directory, or manually by following the steps you can find a bit below.
-1. Wait for a response from the grading bot. You should receive _two_
-responses - first one indicates that your email has reached the bot's inbox and
-so got past Google's anti-virus. Second response will either contain a rejection
-notice along with the detailed error message or an acceptance notice with the
-results of running your submission against our test suite. The bot should
-normally respond in less than five minutes, although depending on the current
-load it could take longer.
+You may create a zip file containing all your source code (contained in `src/main/scala`) and submit it through our [submission website](https://adapted-asp-shortly.ngrok-free.app/).
 
-1. If you don't receive a response from the bot, or you get your submission rejected without a good reason, contact the staff.
+There should be a Scala script to help you with preparing the zip file, `submit.scala`. It requires [Scala CLI](https://scala-cli.virtuslab.org).
+Otherwise, if you are on Unix operating systems (Linux, MacOS, ...) a simple
+```sh
+zip submit.zip src
+```
+from the root of the project directory shall do.
 
-1. If you're not content with your results, follow the instructions in the reply email to try and improve your score. You can retry the submission as many times as you want before the deadline hits, and that won't result in any penalties to your final score.
-
-#### Submitting manually
-
-1. Zip the `src` directory, making sure that:
-  * you haven't created or removed any files from the provided template for the corresponding project. For instance, if the template contained files Arithmetic.scala and Terms.scala in /src/main/scala/fos, don't move these files around or create additional helper files.
-  * you don't zip any other directory, in particular the `target` directory, which contains binary files that might trip Google's anti-virus.
-1. Send the archive produced during the previous step to grading bot's email address: [lamp.fos.bot@gmail.com](mailto:lamp.fos.bot@gmail.com)
-  * The subject of the email should be "Project X (YYYYYY, ZZZZZZ, ...)", where X is the number of the project, and YYYYYY/ZZZZZZ/... are SCIPER numbers of the authors.
-  * The body of the email doesn't matter, because our grading bot can't read.
-  * Don't forget the attachment.
+If you are on Windows, simply zipping the `src` folder (by right-clicking on the folder) does the job.
 
 ### Late submissions
 

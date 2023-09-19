@@ -29,35 +29,35 @@ Exercise sessions take place on *Wed 11:15-13:00, INJ 218*.
 The schedule below is, to a small extent, still provisional.
 
 |-------------|-----------------------------------------------------------------------------|
-| Tue, 19 Sep | Lecture on *Introduction, Syntax and Operational Semantics* |
+| Wed, 20 Sep | Lecture on *Introduction, Syntax and Operational Semantics* |
 | Wed, 20 Sep | Exercise session on Project 1 |
-| reading | Chapter 3, *especially* sections 3.3 and 3.5 |
-| Tue, 26 Sep | Lecture on *Arithmetic Expressions - Proof Principles* |
+| Wed, 20 Sep | Chapter 3, *especially* sections 3.3 and 3.5 |
+| Wed, 27 Sep | Lecture on *Arithmetic Expressions - Proof Principles* |
 | Wed, 27 Sep | Exercise session on Project 1 |
-| reading | Chapter 4, the Untyped Lambda Calculus |
-| Tue, 03 Oct | Lecture on *The Untyped Lambda Calculus (1)* |
+| Wed, 27 Sep | Chapter 4, the Untyped Lambda Calculus |
+| Wed, 04 Oct | Lecture on *The Untyped Lambda Calculus (1)* |
 | Wed, 04 Oct | Pen-and-paper exercise session #1 |
-| Tue, 10 Oct | Lecture on *The Untyped Lambda Calculus (2)* |
+| Wed, 11 Oct | Lecture on *The Untyped Lambda Calculus (2)* |
 | Wed, 11 Oct | Exercise session on Project 1 and 2 |
-| Tue, 17 Oct | Lecture on *The Simply Typed Lambda Calculus* |
+| Wed, 18 Oct | Lecture on *The Simply Typed Lambda Calculus* |
 | Wed, 18 Oct | Pen-and-paper exercise session #2 |
-| Tue, 24 Oct | Lecture on *STLC & Simple Extensions to STLC* |
+| Wed, 25 Oct | Lecture on *STLC & Simple Extensions to STLC* |
 | Wed, 25 Oct | Exercise session on Projects 2 and 3 |
-| Tue, 31 Oct | Lecture on *More Extensions to STLC* |
+| Wed, 01 Nov | Lecture on *More Extensions to STLC* |
 | Wed, 01 Nov | TBA |
-| Tue, 07 Nov | Lecture on *Recursion and State with STLC* |
+| Wed, 08 Nov | Lecture on *Recursion and State with STLC* |
 | Wed, 08 Nov | Exercise session on Project 3 |
-| Tue, 14 Nov | Lecture on *Type Reconstruction and Polymorphism* |
+| Wed, 15 Nov | Lecture on *Type Reconstruction and Polymorphism* |
 | Wed, 15 Nov | Exercise session on Project 4 |
-| Tue, 21 Nov | Lecture on *Subtyping* |
+| Wed, 22 Nov | Lecture on *Subtyping* |
 | Wed, 22 Nov | Pen-and-paper exercise session #3 |
-| Tue, 28 Nov | Lecture on *Dependent types* |
+| Wed, 29 Nov | Lecture on *Dependent types* |
 | Wed, 29 Nov | Coq workshop |
-| Tue, 05 Dec | Lecture on *Objects* |
+| Wed, 06 Dec | Lecture on *Objects* |
 | Wed, 06 Dec | Exercise session on Project 4 and 5 |
-| Tue, 12 Dec | Lecture on *Featherweight Java* |
+| Wed, 13 Dec | Lecture on *Featherweight Java* |
 | Wed, 13 Dec | Pen-and-paper exercise session #4 |
-| Tue, 19 Dec | Lecture on *Elements of Scala.js IR* |
+| Wed, 20 Dec | Lecture on *Elements of Scala.js IR* |
 | Wed, 20 Dec | Exercise session on Project 5 |
 
 
