@@ -28,7 +28,7 @@ For each assignment, you can run `sbt compile` and `sbt run` in the console to c
 Running `sbt` will start an interactive SBT session, after which you can repeatedly compile the project faster compared to running `sbt compile` each time.
 
 We recommend using [VS Code](https://code.visualstudio.com/) with the [Metals](https://marketplace.visualstudio.com/items?itemName=scalameta.metals) extension for development.
-You can find instructions for installing VS Code [here](https://gitlab.epfl.ch/lamp/cs206/-/blob/master/labs/tools-setup.md#step-6-installing-code).
+You can find instructions for installing VS Code [here](https://gitlab.epfl.ch/lamp/cs206/-/blob/4f1694f836db0eed2e99da8a0eed617a5c403f28/labs/tools-setup.md#step-6-installing-code).
 You will need to make sure you have installed JVM __version 11 or 17__, after which it suffices to install Metals and open the assignment directory in VS Code.
 VS Code will allow you to use Scala worksheets, which will let you test and interact with your solutions much more easily.
 

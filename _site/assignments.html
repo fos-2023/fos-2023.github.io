@@ -67,8 +67,8 @@ For each assignment, you can run <code class="language-plaintext highlighter-rou
 Running <code class="language-plaintext highlighter-rouge">sbt</code> will start an interactive SBT session, after which you can repeatedly compile the project faster compared to running <code class="language-plaintext highlighter-rouge">sbt compile</code> each time.</p>
 
 <p>We recommend using <a href="https://code.visualstudio.com/">VS Code</a> with the <a href="https://marketplace.visualstudio.com/items?itemName=scalameta.metals">Metals</a> extension for development.
-You can find instructions for installing VS Code <a href="https://gitlab.epfl.ch/lamp/cs206/-/blob/master/labs/tools-setup.md#step-6-installing-code">here</a>.
-You will need to make sure you have installed JVM version 11 or 17, after which it suffices to install Metals and open the assignment directory in VS Code.
+You can find instructions for installing VS Code <a href="https://gitlab.epfl.ch/lamp/cs206/-/blob/4f1694f836db0eed2e99da8a0eed617a5c403f28/labs/tools-setup.md#step-6-installing-code">here</a>.
+You will need to make sure you have installed JVM <strong>version 11 or 17</strong>, after which it suffices to install Metals and open the assignment directory in VS Code.
 VS Code will allow you to use Scala worksheets, which will let you test and interact with your solutions much more easily.</p>
 
 <p>You can also use <a href="https://www.jetbrains.com/idea/download">IntelliJ IDEA</a> for development.
@@ -87,40 +87,15 @@ as long as your project passes our tests.</p>
 
 <h3 id="submitting-your-solutions">Submitting your solutions</h3>
 
-<ol>
-  <li>Send your project to the grading bot. You can do so by running the <code class="language-plaintext highlighter-rouge">submit.py</code> script in the project directory, or manually by following the steps you can find a bit below.</li>
-  <li>
-    <p>Wait for a response from the grading bot. You should receive <em>two</em>
-responses - first one indicates that your email has reached the bot’s inbox and
-so got past Google’s anti-virus. Second response will either contain a rejection
-notice along with the detailed error message or an acceptance notice with the
-results of running your submission against our test suite. The bot should
-normally respond in less than five minutes, although depending on the current
-load it could take longer.</p>
-  </li>
-  <li>
-    <p>If you don’t receive a response from the bot, or you get your submission rejected without a good reason, contact the staff.</p>
-  </li>
-  <li>If you’re not content with your results, follow the instructions in the reply email to try and improve your score. You can retry the submission as many times as you want before the deadline hits, and that won’t result in any penalties to your final score.</li>
-</ol>
+<p>You may create a zip file containing all your source code (contained in <code class="language-plaintext highlighter-rouge">src/main/scala</code>) and submit it through our <a href="https://adapted-asp-shortly.ngrok-free.app/">submission website</a>.</p>
 
-<h4 id="submitting-manually">Submitting manually</h4>
+<p>There should be a Scala script to help you with preparing the zip file, <code class="language-plaintext highlighter-rouge">submit.scala</code>. It requires <a href="https://scala-cli.virtuslab.org">Scala CLI</a>.
+Otherwise, if you are on Unix operating systems (Linux, MacOS, …) a simple</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zip submit.zip src
+</code></pre></div></div>
+<p>from the root of the project directory shall do.</p>
 
-<ol>
-  <li>Zip the <code class="language-plaintext highlighter-rouge">src</code> directory, making sure that:
-    <ul>
-      <li>you haven’t created or removed any files from the provided template for the corresponding project. For instance, if the template contained files Arithmetic.scala and Terms.scala in /src/main/scala/fos, don’t move these files around or create additional helper files.</li>
-      <li>you don’t zip any other directory, in particular the <code class="language-plaintext highlighter-rouge">target</code> directory, which contains binary files that might trip Google’s anti-virus.</li>
-    </ul>
-  </li>
-  <li>Send the archive produced during the previous step to grading bot’s email address: <a href="mailto:lamp.fos.bot@gmail.com">lamp.fos.bot@gmail.com</a>
-    <ul>
-      <li>The subject of the email should be “Project X (YYYYYY, ZZZZZZ, …)”, where X is the number of the project, and YYYYYY/ZZZZZZ/… are SCIPER numbers of the authors.</li>
-      <li>The body of the email doesn’t matter, because our grading bot can’t read.</li>
-      <li>Don’t forget the attachment.</li>
-    </ul>
-  </li>
-</ol>
+<p>If you are on Windows, simply zipping the <code class="language-plaintext highlighter-rouge">src</code> folder (by right-clicking on the folder) does the job.</p>
 
 <h3 id="late-submissions">Late submissions</h3>
 

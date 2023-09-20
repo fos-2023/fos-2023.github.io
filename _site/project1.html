@@ -163,6 +163,15 @@ down to a value, or it gets stuck when no rule applies). This method should impl
 the big step semantics defined above, and not call reduce. If evaluation is not possible
 it should throw <code class="language-plaintext highlighter-rouge">TermIsStuck</code> exception containing corresponding stuck term.</p>
   </li>
+  <li>
+    <p>Implement the <code class="language-plaintext highlighter-rouge">programVSmallerThan3</code> method. It must return a (constant) string that
+represents a program. The program receives <code class="language-plaintext highlighter-rouge">v</code> as “input”, and must evaluate to <code class="language-plaintext highlighter-rouge">True</code>
+if <code class="language-plaintext highlighter-rouge">v &lt; 3</code> and <code class="language-plaintext highlighter-rouge">False</code> otherwise. <code class="language-plaintext highlighter-rouge">v</code> is guaranteed to be a numeric value.</p>
+  </li>
+  <li>
+    <p>(for further thought:) can you implement a program that tests whether <code class="language-plaintext highlighter-rouge">v</code> is even?
+If not, why not?</p>
+  </li>
 </ol>
 
 <p>All of these are given with stubbed <code class="language-plaintext highlighter-rouge">???</code> body. <code class="language-plaintext highlighter-rouge">???</code> is used to indicated unimplemented
@@ -172,7 +181,12 @@ parts of code in Scala.</p>
 
 <p>We provide a simple runnner for your application that lets you quickly debug your current
 implementation. When you implement <code class="language-plaintext highlighter-rouge">reduce</code> and <code class="language-plaintext highlighter-rouge">eval</code> implementations it should
-produce results like:</p>
+produce results like the following examples.</p>
+
+<p>In extension to the above syntax, a limited form of binding with <code class="language-plaintext highlighter-rouge">"declare" ident "=" term ("," ident "=" term)* "in" term</code>
+is available.
+For now, bindings are directly inlined into references during parsing, and later bindings
+can only reference bindings defined above them.</p>
 
 <p><strong>Example 1</strong>:</p>
 
@@ -197,7 +211,11 @@ Big step: True
 
 <p>input:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pred succ succ succ false
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>declare
+    x = 2,
+    y = succ x
+in
+pred y
 </code></pre></div></div>
 
 <p>output:</p>
