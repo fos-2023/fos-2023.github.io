@@ -48,7 +48,10 @@ as long as your project passes our tests.
 
 You may create a zip file containing all your source code (contained in `src/main/scala`) and submit it through our [submission website](https://adapted-asp-shortly.ngrok-free.app/).
 
-There should be a Scala script to help you with preparing the zip file, `submit.scala`. It requires [Scala CLI](https://scala-cli.virtuslab.org).
+~~There should be a Scala script to help you with preparing the zip file, `submit.scala`. It requires [Scala CLI](https://scala-cli.virtuslab.org).~~
+
+You can create the zip file by calling `sbt packageSrc` (or type `packageSrc` from an sbt shell within your Terminal or Intellij), and the resulting file will be located in `target/scala-3.3.0/for-submit.zip`.
+
 Otherwise, if you are on Unix operating systems (Linux, MacOS, ...) a simple
 ```sh
 zip submit.zip -r src

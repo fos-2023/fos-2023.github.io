@@ -67,7 +67,7 @@ For each assignment, you can run <code class="language-plaintext highlighter-rou
 Running <code class="language-plaintext highlighter-rouge">sbt</code> will start an interactive SBT session, after which you can repeatedly compile the project faster compared to running <code class="language-plaintext highlighter-rouge">sbt compile</code> each time.</p>
 
 <p>We recommend using <a href="https://code.visualstudio.com/">VS Code</a> with the <a href="https://marketplace.visualstudio.com/items?itemName=scalameta.metals">Metals</a> extension for development.
-You can find instructions for installing VS Code <a href="https://gitlab.epfl.ch/lamp/cs206/-/blob/master/labs/tools-setup.md#step-6-installing-code">here</a>.
+You can find instructions for installing VS Code <a href="https://gitlab.epfl.ch/lamp/cs206/-/blob/4f1694f836db0eed2e99da8a0eed617a5c403f28/labs/tools-setup.md#step-6-installing-code">here</a>.
 You will need to make sure you have installed JVM <strong>version 11 or 17</strong>, after which it suffices to install Metals and open the assignment directory in VS Code.
 VS Code will allow you to use Scala worksheets, which will let you test and interact with your solutions much more easily.</p>
 
@@ -89,9 +89,12 @@ as long as your project passes our tests.</p>
 
 <p>You may create a zip file containing all your source code (contained in <code class="language-plaintext highlighter-rouge">src/main/scala</code>) and submit it through our <a href="https://adapted-asp-shortly.ngrok-free.app/">submission website</a>.</p>
 
-<p>There should be a Scala script to help you with preparing the zip file, <code class="language-plaintext highlighter-rouge">submit.scala</code>. It requires <a href="https://scala-cli.virtuslab.org">Scala CLI</a>.
-Otherwise, if you are on Unix operating systems (Linux, MacOS, …) a simple</p>
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zip submit.zip src
+<p><del>There should be a Scala script to help you with preparing the zip file, <code class="language-plaintext highlighter-rouge">submit.scala</code>. It requires <a href="https://scala-cli.virtuslab.org">Scala CLI</a>.</del></p>
+
+<p>You can create the zip file by calling <code class="language-plaintext highlighter-rouge">sbt packageSrc</code> (or type <code class="language-plaintext highlighter-rouge">packageSrc</code> from an sbt shell within your Terminal or Intellij), and the resulting file will be located in <code class="language-plaintext highlighter-rouge">target/scala-3.3.0/for-submit.zip</code>.</p>
+
+<p>Otherwise, if you are on Unix operating systems (Linux, MacOS, …) a simple</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zip submit.zip <span class="nt">-r</span> src
 </code></pre></div></div>
 <p>from the root of the project directory shall do.</p>
 

@@ -1,0 +1,343 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Foundations of Software</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <a href="index.html"><h1>Foundations of Software</h1></a>
+        
+          
+        
+          
+            <p><a href="staff.html">Staff</a></p>
+          
+        
+          
+            <p><a href="documents.html">Documents</a></p>
+          
+        
+          
+            <p><a href="assignments.html">Assignments</a></p>
+          
+        
+          
+            <p><a href="project1.html">Project 1 - The NB Language</a></p>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </header>
+      <section>
+        <h1 id="project-3-simply-typed-lambda-calculus">Project 3: Simply Typed Lambda Calculus</h1>
+
+<p><strong>Hand in:</strong> 08 Nov 2023, 23:59 (Europe/Zurich)</p>
+
+<p><strong>Project template:</strong> <a href="projects/3-typed.zip">3-typed.zip</a></p>
+
+<p>The goal of this exercise is to familiarize yourself with the simply typed λ-calculus; your work consists of implementing a type
+checker and a reducer for simply typed λ-terms. To make it more interesting, we extend λ-calculus with boolean and
+integer values, as well as let and pair constructs. This time we’ll fix a call-by-value strategy, so there will be only one reducer you need to write (actually,
+you can reuse some of the reducer from the previous assignment.</p>
+
+<p>We first introduce the syntax for typed λ-calculus without <em>let</em> and <em>pairs</em>, which we’ll add later. It might be a good
+idea to start implementing this language first and later add the rest. The syntax is presented here:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= "true"                      true value
+    | "false"                     false value
+    | "if" t "then" t "else" t    if
+    | numericLit                  integer
+    | "pred" t                    predecessor
+    | "succ" t                    successor
+    | "iszero" t                  iszero
+    | x                           variable
+    | "\" x ":" T "." t           abstraction
+    | t t                         application (left associative)
+    | "(" t ")"
+
+v ::= "true"
+    | "false"
+    | nv                          numeric value
+    | "\" x ":" T "." t           abstraction value
+
+nv ::= "0"                        numeric values
+     | "succ" nv
+</code></pre></div></div>
+
+<p>Note: As in the first assignment, we add syntactic sugar for numeric literals. They are desugared to the corresponding sequence of
+<code class="language-plaintext highlighter-rouge">succ succ ... 0</code>, as described before.</p>
+
+<p>The only new thing in the above rules is the type annotation for lambda abstractions. We see that the variable name is followed by colon and
+a type. It roughly says “this function expects an argument of type <code class="language-plaintext highlighter-rouge">T</code>”. In the above rules, <code class="language-plaintext highlighter-rouge">T</code> stands for types, and here’s the syntax for
+types:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>T ::= "Bool"                      boolean type
+    | "Nat"                       numeric type
+    | T "-&gt;" T                    function types  (right associative)
+    | "(" T ")"
+</code></pre></div></div>
+
+<p>There are three kinds of types in this language: booleans, natural numbers and function types. The type constructor “→” is
+right-associative – that is, the expression <code class="language-plaintext highlighter-rouge">T</code><sub><code class="language-plaintext highlighter-rouge">1</code></sub><code class="language-plaintext highlighter-rouge"> → T</code><sub><code class="language-plaintext highlighter-rouge">2</code></sub><code class="language-plaintext highlighter-rouge"> → T</code><sub><code class="language-plaintext highlighter-rouge">3</code></sub> stands for
+<code class="language-plaintext highlighter-rouge">T</code><sub><code class="language-plaintext highlighter-rouge">1</code></sub><code class="language-plaintext highlighter-rouge"> → (T</code><sub><code class="language-plaintext highlighter-rouge">2</code></sub><code class="language-plaintext highlighter-rouge"> → T</code><sub><code class="language-plaintext highlighter-rouge">3</code></sub><code class="language-plaintext highlighter-rouge">)</code> [TAPL, p.100].</p>
+
+<h2 id="evaluation-rules">Evaluation rules</h2>
+
+<p>Evaluation rules for this language are presented below. You may note that they already fix the evaluation strategy to call-by-value, and
+that the type of an abstraction is ignored during evaluation.</p>
+
+<p>We can say that evaluation of simply typed lambda terms proceeds exactly the
+same as for untyped lambda terms. The operation of stripping off type annotations is called <em>erasure</em> and it is what enabled the addition of
+Java generics without modifying the virtual machine.</p>
+
+<p><strong>Computation Rules:</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>if true then t1 else t2 → t1
+
+if false then t1 else t2 → t2
+
+iszero 0 → true
+
+iszero succ NV → false
+
+pred 0 → 0
+
+pred succ NV → NV
+
+(λx: T. t1) v2 → [x → v2] t1
+</code></pre></div></div>
+
+<p><strong>Congruence Rules:</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                   t1 → t1'
+----------------------------------------------
+if t1 then t2 else t3 → if t1' then t2 else t3
+
+       t → t'
+--------------------
+iszero t → iszero t'
+
+     t → t'
+----------------
+succ t → succ t'
+
+     t → t'
+----------------
+pred t → pred t'
+
+   t1 → t1'
+--------------
+t1 t2 → t1' t2
+
+   t2 → t2'
+--------------
+v1 t2 → v1 t2'
+</code></pre></div></div>
+
+<h2 id="typing-rules">Typing rules</h2>
+
+<p>The typing rules of the figure given below define a typing relation, similar to the evaluation relation. However, while evaluation is a relation between terms,
+typing is a relation between terms, types and contexts.</p>
+
+<p>A typing rule like the first one can be read “under context gamma, term <code class="language-plaintext highlighter-rouge">true</code>
+has type <code class="language-plaintext highlighter-rouge">Bool</code>”. The role of the context (or environment) is to keep around a mapping between variable names and their types. It will be
+used to type free variables, when they are encountered. This is illustrated by the variable rule which can be read “under context gamma,
+variable <code class="language-plaintext highlighter-rouge">x</code> has type <code class="language-plaintext highlighter-rouge">T</code> provided context gamma has a binding for variable <code class="language-plaintext highlighter-rouge">x</code> to type <code class="language-plaintext highlighter-rouge">T</code>”.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Γ ⊢ true : Bool
+
+Γ ⊢ false : Bool
+
+Γ ⊢ 0 : Nat
+
+  Γ ⊢ t : Nat
+----------------
+Γ ⊢ pred t : Nat
+
+  Γ ⊢ t : Nat
+----------------
+Γ ⊢ succ t : Nat
+
+    Γ ⊢ t : Nat
+-------------------
+Γ ⊢ iszero t : Bool
+
+Γ ⊢ t1: Bool  Γ ⊢ t2 : T  Γ ⊢ t3 : T
+-------------------------------------
+    Γ ⊢ if t1 then t2 else t3 : T
+
+x : T ∈ Γ
+---------
+Γ ⊢ x : T
+
+  Γ, x : T1 ⊢ t : T2
+-----------------------
+Γ ⊢ λx: T1. t : T1 →T2
+
+Γ ⊢ t1 : T11 → T12   Γ ⊢ t2 : T11
+---------------------------------
+       Γ ⊢ t1 t2 : T12
+</code></pre></div></div>
+
+<p>The purpose of this type system is to prevent “bad things” from happening. So far, the only bad thing we know is stuck terms, and this type
+system prevents stuck terms. In other words, a term that can be assigned a type (it type checks) is guaranteed not to get stuck. The result
+of its evaluation will be a value.</p>
+
+<h2 id="adding-let-via-desugaring">Adding <em>let</em> via desugaring</h2>
+
+<p>Let us now proceed to the addition of <code class="language-plaintext highlighter-rouge">let</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...
+    | "let" x ":" T "=" t "in" t
+</code></pre></div></div>
+
+<p>We can define <code class="language-plaintext highlighter-rouge">let</code> in terms of the existing concepts, and this has the advantage that once the translation (also called “desugaring”) is done in the parser, no addition
+is necessary to the type checker or to the evaluator. Such an addition is called a derived form. The language that is accepted by our parser
+is called external language and the language understood by the evaluator (and type checker) is called internal language.</p>
+
+<p><em>Desugaring of derived forms is very convenient from a scientific point of view (so much that it’s become a de facto standard in literature). However, careless desugaring in a practical compiler invites trouble. As our experience with scalac shows, performing desugarings during parsing is not a very good idea, because it: 1) confuses tools, e.g. hyperlinking in IDEs, 2) makes prettyprinting and error messages less helpful, 3) complicates compiler extensibility. In this toy project, you’ll desugar in parser, because it’s really simple to implement, but we would also like you to understand the associated trade-offs.</em></p>
+
+<p>Now, without further ado, let’s see the
+translation of let in terms of abstraction and application:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let x: T = t1 in t2 =&gt; (λx:T. t2) t1
+</code></pre></div></div>
+
+<h2 id="adding-pairs-the-hard-way">Adding <em>pairs</em> the hard way</h2>
+
+<p>To add pairs, we can’t do the same trick, because there are no existing language features to piggyback onto, so we’ll need to extends the existing syntax, evaluation and typing rules:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...
+    | "{" t "," t "}"
+    | "fst" t
+    | "snd" t
+
+v ::= ...
+    | "{" v "," v "}"
+
+T ::= ...
+     | T "*" T                    (right associative)
+</code></pre></div></div>
+
+<p>The first form creates a new pair, and the other two are called projections, and extract the first and the second element of a pair. We add
+a new kind of values, pair values, and a new kind of type, for the corresponding pair type. We decide that the pair type constructor
+(denoted by <code class="language-plaintext highlighter-rouge">*</code>) takes precedence over the arrow constructor, so <code class="language-plaintext highlighter-rouge">Nat * Nat → Bool</code> is parsed as <code class="language-plaintext highlighter-rouge">(Nat * Nat) → Bool</code>, and that function application takes precedence over projections so <code class="language-plaintext highlighter-rouge">snd x y</code> is parsed as <code class="language-plaintext highlighter-rouge">snd (x y)</code>.
+The new evaluation rules are presented below:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fst {v1, v2} → v1
+
+snd {v1, v2} → v2
+
+    t → t'
+--------------
+fst t → fst t'
+
+    t → t'
+--------------
+snd t → snd t'
+
+      t1 → t1'
+--------------------
+{t1, t2} → {t1', t2}
+
+      t2 → t2'
+--------------------
+{v1, t2} → {v1, t2'}
+</code></pre></div></div>
+
+<p>The new typing rules are as follows:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Γ ⊢ t1 : T1   Γ ⊢ t2 : T2
+--------------------------
+  Γ ⊢ {t1, t2} : T1 * T2
+
+Γ ⊢ t : T1 * T2
+---------------
+Γ ⊢ fst t : T1
+
+Γ ⊢ t : T1 * T2
+---------------
+Γ ⊢ snd t : T2
+</code></pre></div></div>
+
+<h2 id="what-you-have-to-do">What you have to do</h2>
+
+<ol>
+  <li>
+    <p>Implement <code class="language-plaintext highlighter-rouge">Term</code> parser that recognizes this language, using the combinator library. The parser must produce abstract syntax trees defined in <code class="language-plaintext highlighter-rouge">Terms.scala</code>.</p>
+  </li>
+  <li>
+    <p>Implement <code class="language-plaintext highlighter-rouge">reduce</code> method which performs one step of the evaluation, according to the rules of call-by-value reducer (small step). If none of the rules apply, it should throw <code class="language-plaintext highlighter-rouge">NoRuleApplies</code> exception containing corresponding irreducible term.</p>
+  </li>
+  <li>
+    <p>Implement <code class="language-plaintext highlighter-rouge">typeof</code> method which given a term finds its type. In the case of failure, it should throw <code class="language-plaintext highlighter-rouge">TypeError</code> exception containing the ill-typed term. The ill-typed term is the leftmost innermost term that doesn’t typecheck, i.e. that doesn’t have any typing rules that apply to it.</p>
+  </li>
+</ol>
+
+<h2 id="development--debugging">Development &amp; debugging</h2>
+
+<p>We provide a simple runnner for your application that lets you quickly debug your current implementation. When you implement <code class="language-plaintext highlighter-rouge">Term</code>, <code class="language-plaintext highlighter-rouge">reduce</code> and <code class="language-plaintext highlighter-rouge">typeof</code> it should produce results like:</p>
+
+<p><strong>Example 1</strong>:</p>
+
+<p>input:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(\x:Nat-&gt;Bool. (\y:Nat.(x y))) (\x:Nat.(iszero x)) 0
+</code></pre></div></div>
+
+<p>output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typed: Bool
+(\x:Nat-&gt;Bool.(\y:Nat.x y)) (\x:Nat.iszero x) 0
+(\y:Nat.(\x:Nat.iszero x) y) 0
+(\x:Nat.iszero x) 0
+iszero 0
+true
+</code></pre></div></div>
+
+<p><strong>Example 2</strong>:</p>
+
+<p>input:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(\x:Nat.x) true
+</code></pre></div></div>
+
+<p>output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>parameter type mismatch: expected Nat, found Bool
+(\x:Nat.x) true
+</code></pre></div></div>
+
+<p><strong>Example 3</strong>:</p>
+
+<p>input:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(\x:Nat.snd x) 1
+</code></pre></div></div>
+
+<p>output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pair type expected but Nat found
+snd x
+</code></pre></div></div>
+
+      </section>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+  </body>
+</html>

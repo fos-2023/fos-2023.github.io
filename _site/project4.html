@@ -1,0 +1,542 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Foundations of Software</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <a href="index.html"><h1>Foundations of Software</h1></a>
+        
+          
+        
+          
+            <p><a href="staff.html">Staff</a></p>
+          
+        
+          
+            <p><a href="documents.html">Documents</a></p>
+          
+        
+          
+            <p><a href="assignments.html">Assignments</a></p>
+          
+        
+          
+            <p><a href="project1.html">Project 1 - The NB Language</a></p>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </header>
+      <section>
+        <h1 id="project-4-stlc-extensions">Project 4: STLC Extensions</h1>
+
+<p><strong>Hand in:</strong> 06 Dec 2023, 23:59 (Europe/Zurich)<br /></p>
+
+<p><strong>Project template:</strong> <a href="projects/4-extensions.zip">4-extensions.zip</a></p>
+
+<p>The project skeleton is very similar to the one from the last assignment.
+You should download the template and copy your definitions from the previous project.
+The final submission should contain all extensions, both from this assignment and from the last assignment.
+In this assignment, you will extend your simply typed lambda calculus project from project 3 with several features.</p>
+
+<p>There is a common base that everyone must implement:</p>
+
+<ul>
+  <li>sum types, and</li>
+  <li>recursive functions (the <code class="language-plaintext highlighter-rouge">fix</code> operator).</li>
+</ul>
+
+<p>In addition, each group must <em>choose one</em> of the following “bundles” of features:</p>
+
+<ul>
+  <li>imperative programming bundle: unit, sequencing and mutable state, or</li>
+  <li>functional programming bundle: tuples, lists and universal types, or</li>
+  <li>subtyping bundle: records and subtyping.</li>
+</ul>
+
+<p>In any case, there is <em>no type reconstruction</em> in this project.</p>
+
+<h2 id="attention-no-grader-feedback-for-the-extensions">Attention! No grader feedback for the extensions</h2>
+
+<p>The automatic tests that you receive from the bot will only test the common base.
+For your chosen bundle, <strong>you must write tests yourselves</strong> to validate that you correctly implemented it.
+Additional testing of the bundles will be done after your final submission.</p>
+
+<h2 id="grading-for-the-bundles">Grading for the bundles</h2>
+
+<p>The grade of this project will be 50% for the common base, and 50% for your bundle.</p>
+
+<p>If you feel adventurous, you may implement <em>several</em> bundles.
+In that case, we will take the <em>highest</em> grade you achieve among the 3 bundles.</p>
+
+<h2 id="built-in-rules-or-derived-forms">Built-in rules or derived forms</h2>
+
+<p>Unless otherwise specified, all the features must be built-in (as opposed to derived forms).</p>
+
+<h2 id="sum-types">Sum Types</h2>
+
+<p>Sum types are handy when one needs to handle heterogeneous collections of values. Imagine you
+have a data type like a tree, where each element can be a leaf (containing a value) or an inner
+node (containing two references to subtrees). A sum type is a type which draws its values from
+exactly two other types. In other words, values of a sum type T1 + T2 can be either of type T1
+or of type T2. We introduce now syntactic rules for sum types, together with evaluation and
+typing rules.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...                                                terms
+    | "inl" t "as" T                                     inject left
+    | "inr" t "as" T                                     inject right
+    | "case" t "of" "inl" x "=&gt;" t "|" "inr" x "=&gt;" t    case
+
+v ::= ...                                                values
+    | "inl" v "as" T
+    | "inr" v "as" T
+
+T ::= ...                                                types
+    | T "+" T                                            sum type (right assoc.)
+</code></pre></div></div>
+
+<p>We create values of a sum type by injecting a value in the left or right “part”. To deconstruct
+such values, we use a case expression, similar to Scala’s match construct.</p>
+
+<p>Sum types are right associative and <code class="language-plaintext highlighter-rouge">+</code> has the same precedence as <code class="language-plaintext highlighter-rouge">*</code>.</p>
+
+<p>Evaluation rules for sum type extension:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>case (inl v0) of inl x1 =&gt; t1 | inr x2 =&gt; t2  →  [x1 → v0] t1
+
+case (inr v0) of inl x1 =&gt; t1 | inr x2 =&gt; t2  →  [x2 → v0] t2
+
+                                   t   →   t'
+--------------------------------------------------------------------------------
+case t of inl x1 =&gt; t1 | inr x2 =&gt; t2  →  case t' of inl x1 =&gt; t1 | inr x2 =&gt; t2
+
+
+    t  →  t'
+----------------
+inl t  →  inl t'
+
+    t  →  t'
+----------------
+inr t  →  inr t'
+</code></pre></div></div>
+
+<p>And lastly new typing rules:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Γ ⊢ t0: T1 + T2    Γ, x1: T1 ⊢ t1: T    Γ, x2: T2 ⊢ t2: T
+---------------------------------------------------------
+     Γ ⊢ case t0 of inl x1 =&gt; t1 | inr x2 =&gt; t2: T
+
+
+          Γ ⊢ t1: T1
+-------------------------------
+Γ ⊢ inl t1 as T1 + T2 : T1 + T2
+
+          Γ ⊢ t1: T2
+-------------------------------
+Γ ⊢ inr t1 as T1 + T2 : T1 + T2
+</code></pre></div></div>
+
+<p>Evaluation and typing rules are pretty straightforward, the only thing a bit out of
+ordinary is the type adornment for inl and inr. This is necessary because the two
+constructors can’t possibly know what is the type of the other component of the sum
+type. By giving it explicitly, the type checker is able to proceed. Alternatives to
+this decision will be explored in other exercises, when we know about type inference.</p>
+
+<h2 id="the-fix-operator">The fix operator</h2>
+
+<p>To bring back the fun into the game, we need some way to write non terminating programs
+(or at least, looping programs). Since types arrived, we were unable
+to type the fixpoint operator, and indeed there’s a theorem which states that all well
+typed terms in simply typed lambda calculus evaluate to a normal form. The only
+alternative is to add it into the language.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...        terms
+    | "fix" t    fixed point of t
+</code></pre></div></div>
+
+<p>New reduction rules:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fix (λx: T1. t2)  →  [x → fix (λx: T1. t2)] t2
+
+    t  →  t'
+----------------
+fix t  →  fix t'
+</code></pre></div></div>
+
+<p>New typing rules:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Γ ⊢ t1: T1 → T1
+---------------
+Γ ⊢ fix t1: T1
+</code></pre></div></div>
+
+<p>In order to make the fixpoint operator easier to use, add the following derived form:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>letrec x: T1 = t1 in t2  ⇒  let x = fix (λx: T1. t1) in t2
+</code></pre></div></div>
+
+<p>Don’t forget that we implement let as a derived form as well, so the actual desugaring
+is a bit more complex.</p>
+
+<h2 id="imperative-programming-bundle">Imperative programming bundle</h2>
+
+<p>The imperative programming bundle contains three features:</p>
+
+<ul>
+  <li>The <code class="language-plaintext highlighter-rouge">unit</code> value and its <code class="language-plaintext highlighter-rouge">Unit</code> type, as defined in Section 11.2 (Figure 11-2)</li>
+  <li>Sequencing as defined in Section 11.3 of the book</li>
+  <li>Mutable state with references, as defined in Chapter 13</li>
+</ul>
+
+<p>For mutable references, <em>do not introduce Σ in your <code class="language-plaintext highlighter-rouge">typeof</code> function</em>!
+You do not need to give types to <em>locations</em>, since locations cannot be written in a source program.
+Store typings are only necessary as an artifact of safety proofs, but we are not doing proofs here.</p>
+
+<p>You must, however, introduce μ in your evaluation function, and hence you have to implement the overload of <code class="language-plaintext highlighter-rouge">reduce</code> that manipulates <code class="language-plaintext highlighter-rouge">Store</code>s.</p>
+
+<p>Terms:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...
+    | unit            the unit value
+    | t; t            sequence
+    | ref t           allocate new reference
+    | !t              dereference
+    | t := t          assignment
+    | l               location (but not available in the source program, so not in the parser)
+</code></pre></div></div>
+
+<p>Types:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>T ::= ...
+    | Unit
+    | Ref T
+</code></pre></div></div>
+
+<p>Evaluation rules:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    t1 | μ  →  t1' | μ'
+---------------------------
+t1; t2 | μ  →  t1'; t2 | μ'
+
+-----------------------
+unit; t2 | μ  →  t2 | μ
+
+    t1 | μ  →  t1' | μ'
+---------------------------
+ref t1 | μ  →  ref t1' | μ'
+
+      l ∉ dom(μ)
+----------------------------------
+ref v1 | μ  →  l | (μ, l -&gt; v1)
+
+ t1 | μ  →  t1' | μ'
+---------------------
+!t1 | μ  →  !t1' | μ'
+
+    μ(l) = v
+----------------
+!l | μ  →  v | μ
+
+      t1 | μ  →  t1' | μ'
+--------------------------------
+t1 := t2 | μ  →  !t1' := t2 | μ'
+
+      t2 | μ  →  t2' | μ'
+--------------------------------
+v1 := t2 | μ  →  !v1 := t2' | μ'
+
+---------------------------------
+l := v2 | μ  →  unit | [l -&gt; v2]μ
+</code></pre></div></div>
+
+<p>Typing rules (note that there is no Σ, and no rule for locations):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---------------
+Γ ⊢ unit : Unit
+
+Γ ⊢ t1 : Unit     Γ ⊢ t2 : T2
+-----------------------------
+    Γ ⊢ t1; t2 : T2
+
+   Γ ⊢ t1 : T1
+-------------------
+Γ ⊢ ref t1 : Ref T1
+
+Γ ⊢ t1 : Ref T1
+---------------
+  Γ ⊢ !t1 : T1
+
+Γ ⊢ t1 : Ref T1    Γ ⊢ t2 : T1
+------------------------------
+    Γ ⊢ t1 := t2 : Unit
+</code></pre></div></div>
+
+<h2 id="functional-programming-bundle">Functional programming bundle</h2>
+
+<p>The function programming bundle contains two features:</p>
+
+<ul>
+  <li>Explicit universal types, aka System F, as defined Section 23.3 (Figure 23-1)</li>
+  <li>Records, as defined in Section 11.8 (Figure 11-7)</li>
+  <li>Tuples, like defined in Section 11.7 (Figure 11-6), <em>but as a derived form</em></li>
+  <li>Lists, almost as defined in Section 11.12 (Figure 11-13)</li>
+</ul>
+
+<p>Tuples <em>must</em> desugar into records whose labels are “integer strings”, such as <code class="language-plaintext highlighter-rouge">"1"</code>, <code class="language-plaintext highlighter-rouge">"2"</code>, etc.</p>
+
+<p>As shown by a suggested exercise in the book, <code class="language-plaintext highlighter-rouge">head</code> and <code class="language-plaintext highlighter-rouge">tail</code> are not sound.
+Therefore, we make a few changes compared to the presention in Section 11.12:</p>
+
+<ul>
+  <li>We remove <code class="language-plaintext highlighter-rouge">head</code> and <code class="language-plaintext highlighter-rouge">tail</code></li>
+  <li>We introduce instead a pattern matching construct</li>
+  <li>We remove <code class="language-plaintext highlighter-rouge">isnil</code> because it is redundant</li>
+</ul>
+
+<p>The pattern matching construct is similar to the one for sum types.
+Despite the similarity of the surface syntax, it is truly a different, distinct term shape from the one for sum types.</p>
+
+<p>Terms:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...
+    | "/\" X "." t                                        type abstraction
+    | t "[" T "]"                                         type application
+    | "{" { l "=" t "," } "}"                             record
+    | t "." l                                             record projection
+    | "{" { t "," } "}"                                   tuple (to be desugared)
+    | t "." i                                             tuple projection (to be desugared)
+    | "nil "[" T "]"                                      empty list
+    | "cons "[" T "]" t t                                 list constructor
+    | "case" t "of" "nil" "=&gt;" t "|" "cons" x y "=&gt;" t    list case
+</code></pre></div></div>
+
+<p>We use <code class="language-plaintext highlighter-rouge">{ ... }</code> to denote repetition (0 to many times).
+The last comma is required to simplify the notation of the term syntax here.
+You must at least parse variants with the last comma; you are free to <em>also</em> parse variants without that comma if you want.</p>
+
+<p>Types:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>T ::= ...
+    | X                             type variable
+    | "\/" X "." T                  universal type
+    | "{" { l ":" T "," } "}"       type of records
+    | "{" { Ti "," } "}"            type of tuples (to be desugard)
+    | List T                        type of lists
+</code></pre></div></div>
+
+<p>Evaluation rules:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     t1  →  t1'
+--------------------
+t1 [T2]  →  t1' [T2]
+
+(λX: t1) [T2]  →  [X → T2]t1
+
+                        tj  →  tj'
+------------------------------------------------------------
+{li = vi, lj = tj, lk = tk}  →  {li = vi, lj = tj', lk = tk}
+     with i ∈ 1..(j-1) and k ∈ (j+1)..n
+
+  t1  →  t1'
+--------------
+t1.l  →  t1'.l
+
+{li = vi}.lj  →  vj
+
+            t1  →  t1'
+----------------------------------
+cons [T] t1 t2  →  cons [T] t1' t2
+
+            t2  →  t2'
+----------------------------------
+cons [T] v1 t2  →  cons [T] v1 t2'
+
+                                  t1   →   t1'
+--------------------------------------------------------------------------------
+case t1 of nil =&gt; t2 | cons x y =&gt; t3  →  case t1' of nil =&gt; t2 | cons x y =&gt; t3
+
+case nil of nil =&gt; t2 | cons x y =&gt; t3  →  t2
+
+case (const v0 v1) of nil =&gt; t2 | cons x y =&gt; t3  →  [x → v0] [y → v1] t3
+</code></pre></div></div>
+
+<p>Typing rules:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Γ, X ⊢ t2 : T2
+-----------------
+Γ ⊢ λX.t2 : ∀X.T2
+
+     Γ ⊢ t1 : ∀X.T1
+------------------------
+Γ ⊢ t1 [T2] : [X → T2]T1
+
+        for each i  Γ ⊢ ti : Ti
+-----------------------------------------
+Γ ⊢ {l1=t1 ... ln=tn} : {l1:T1 ... ln:Tn}
+
+Γ ⊢ t1 : {l1:T1 ... ln:Tn}
+--------------------------
+      Γ ⊢ t1.li : Ti
+
+Γ ⊢ nil [T] : List T
+
+Γ ⊢ t1 : T1     Γ ⊢ t2 : List T1
+--------------------------------
+  Γ ⊢ cons [T] t1 t2 : List T2
+
+Γ ⊢ t1 : List T1   Γ ⊢ t2 : T   Γ, x: T1, y: List T1 ⊢ t3 : T
+-------------------------------------------------------------
+      Γ ⊢ case t1 of nil =&gt; t2 | cons x y =&gt; t3 : T
+</code></pre></div></div>
+
+<p>Self-check: can you define a <code class="language-plaintext highlighter-rouge">map</code> function in your language?</p>
+
+<p>Further thoughts: could we define <code class="language-plaintext highlighter-rouge">nil</code> and <code class="language-plaintext highlighter-rouge">cons</code> as regular terms with polymorphic types, as suggested in Section 23.4?
+What would be difficult given the structure of our evaluation processor?</p>
+
+<h2 id="subtyping-bundle">Subtyping bundle</h2>
+
+<p>The subtyping bundle contains three features:</p>
+
+<ul>
+  <li>Records, as defined in Section 11.8 (Figure 11-7)</li>
+  <li>Subtyping for records, as defined in selected sections of Chapters 15 and 16 (Figures 15-1, 16-2 and 16-3)</li>
+  <li>Ascription, as defined in Section 11.4 (Figure 11-3)</li>
+</ul>
+
+<p>Note that we use <em>algorithmic subtyping and typing</em>, as presented in Chapter 16.
+We have not seen that in the lectures at the time this project starts (we will see the coming week).
+You may want to skim through Section 16.1 and 16.2, but the rules below recap everything.</p>
+
+<p>The reason we introduce ascription is that it relieves us from having to think about Joins and Meets (see Section 16-3).
+We can instead use ascription to force the two sides of an if-then-else to have the same type.</p>
+
+<p>Terms:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...
+    | "{" { l "=" t "," } "}"       record
+    | t "." l                       projection
+    | t "as" T                      ascription
+</code></pre></div></div>
+
+<p>We use <code class="language-plaintext highlighter-rouge">{ ... }</code> to denote repetition (0 to many times).
+The last comma is required to simplify the notation of the term syntax here.
+You must at least parse variants with the last comma; you are free to <em>also</em> parse variants without that comma if you want.</p>
+
+<p>Types:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>T ::= ...
+    | "{" { l ":" T "," } "}"       type of records
+</code></pre></div></div>
+
+<p>Evaluation rules:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                        tj  →  tj'
+------------------------------------------------------------
+{li = vi, lj = tj, lk = tk}  →  {li = vi, lj = tj', lk = tk}
+     with i ∈ 1..(j-1) and k ∈ (j+1)..n
+
+  t1  →  t1'
+--------------
+t1.l  →  t1'.l
+
+{li = vi}.lj  →  vj
+
+     t1  →  t1'
+--------------------
+t1 as T  →  t1' as T
+
+v1 as T  →  v1
+</code></pre></div></div>
+
+<p>Subtyping rules:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Nat &lt;: Nat
+
+Bool &lt;: Bool
+
+      {li...} ⊆ {kj...}   for i ∈ 1..n and j ∈ 1..m
+            if kj = li then Sj &lt;: Ti
+--------------------------------------------------------
+   {kj: Sj...} &lt;: {li: Ti...}  for i ∈ 1..n and j ∈ 1..m
+
+T1 &lt;: S1     S2 &lt;: T2
+---------------------
+  S1 → S2 &lt;: T1 → T2
+</code></pre></div></div>
+
+<p>Typing rules:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Γ ⊢ t1 : T1     T1 = T11 → T12
+Γ ⊢ t2 : T2     T2 &lt;: T11
+------------------------------
+      Γ ⊢ t1 t2 : T12
+
+        for each i  Γ ⊢ ti : Ti
+-----------------------------------------
+Γ ⊢ {l1=t1 ... ln=tn} : {l1:T1 ... ln:Tn}
+
+Γ ⊢ t1 : R1    R1 = {l1:T1 ... ln:Tn}
+-------------------------------------
+          Γ ⊢ t1.li : Ti
+
+Γ ⊢ t1 : T1     T1 &lt;: T
+-----------------------
+    Γ ⊢ t1 as T : T
+</code></pre></div></div>
+
+<h2 id="what-you-need-to-do">What you need to do</h2>
+
+<ol>
+  <li>
+    <p>Choose (at least) one bundle to implement. Add to it the sum types and the <code class="language-plaintext highlighter-rouge">fix</code> operator.</p>
+  </li>
+  <li>
+    <p>Implement the <code class="language-plaintext highlighter-rouge">Term</code> parser that recognizes your extended language, using the combinator library.
+The parser must produce abstract syntax trees defined in <code class="language-plaintext highlighter-rouge">Terms.scala</code>.</p>
+  </li>
+  <li>
+    <p>Implement <code class="language-plaintext highlighter-rouge">reduce</code> method which performs one step of the evaluation, according to the
+rules of call-by-value reducer (small step). If none of the rules apply, it should throw
+<code class="language-plaintext highlighter-rouge">NoRuleApplies</code> exception containing corresponding irreducible term.</p>
+  </li>
+  <li>
+    <p>Implement the <code class="language-plaintext highlighter-rouge">typeof</code> method which, given a term, finds its type. In the case of failure,
+it should throw a <code class="language-plaintext highlighter-rouge">TypeError</code> exception containing the ill-typed term. The ill-typed term
+is the leftmost innermost term that doesn’t typecheck, i.e. that doesn’t have any typing
+rules that apply to it.</p>
+  </li>
+  <li>
+    <p>Do not forget to write tests for your chosen bundle.</p>
+  </li>
+</ol>
+
+<p><strong>Hint</strong>: re-using code from previous assignments might be a good idea.</p>
+
+<h2 id="development--debugging">Development &amp; debugging</h2>
+
+<p>Since the project skeleton is the same as in the previous assignment, everything from
+the “Development &amp; debugging” section in <a href="project3.html">the previous project description</a>
+applies to this project as well.</p>
+
+      </section>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+  </body>
+</html>
