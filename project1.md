@@ -112,12 +112,12 @@ step evaluation rules would look for this language:
 
 1. Implement `reduce` method which performs one step of the evaluation, according to the rules
    of the small step semantics. If none of the rules apply it should throw `NoReductionPossible`
-   exception containing corresponding irreducible term.
+   exception containing the smallest corresponding irreducible term.
 
 1. Implement `eval` method which implements a big step evaluator (one which evaluates a term
    down to a value, or it gets stuck when no rule applies). This method should implement
    the big step semantics defined above, and not call reduce. If evaluation is not possible
-   it should throw `TermIsStuck` exception containing corresponding stuck term.
+   it should throw `TermIsStuck` exception containing the smallest corresponding stuck term.
 
 1. Implement the `programVSmallerThan3` method. It must return a (constant) string that
    represents a program. The program receives `v` as "input", and must evaluate to `True`
@@ -162,7 +162,7 @@ output:
 input:
 
     declare
-        x = 2,
+        x = succ succ false,
         y = succ x
     in
     pred y

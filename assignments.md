@@ -51,7 +51,7 @@ You may create a zip file containing all your source code (contained in `src/mai
 There should be a Scala script to help you with preparing the zip file, `submit.scala`. It requires [Scala CLI](https://scala-cli.virtuslab.org).
 Otherwise, if you are on Unix operating systems (Linux, MacOS, ...) a simple
 ```sh
-zip submit.zip src
+zip submit.zip -r src
 ```
 from the root of the project directory shall do.
 

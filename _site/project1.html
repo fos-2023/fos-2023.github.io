@@ -163,15 +163,6 @@ down to a value, or it gets stuck when no rule applies). This method should impl
 the big step semantics defined above, and not call reduce. If evaluation is not possible
 it should throw <code class="language-plaintext highlighter-rouge">TermIsStuck</code> exception containing corresponding stuck term.</p>
   </li>
-  <li>
-    <p>Implement the <code class="language-plaintext highlighter-rouge">programVSmallerThan3</code> method. It must return a (constant) string that
-represents a program. The program receives <code class="language-plaintext highlighter-rouge">v</code> as “input”, and must evaluate to <code class="language-plaintext highlighter-rouge">True</code>
-if <code class="language-plaintext highlighter-rouge">v &lt; 3</code> and <code class="language-plaintext highlighter-rouge">False</code> otherwise. <code class="language-plaintext highlighter-rouge">v</code> is guaranteed to be a numeric value.</p>
-  </li>
-  <li>
-    <p>(for further thought:) can you implement a program that tests whether <code class="language-plaintext highlighter-rouge">v</code> is even?
-If not, why not?</p>
-  </li>
 </ol>
 
 <p>All of these are given with stubbed <code class="language-plaintext highlighter-rouge">???</code> body. <code class="language-plaintext highlighter-rouge">???</code> is used to indicated unimplemented
