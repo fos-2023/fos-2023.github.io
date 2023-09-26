@@ -34,7 +34,7 @@ The schedule below is, to a small extent, still provisional.
 | Wed, 20 Sep | Chapter 3, *especially* sections 3.3 and 3.5 |
 | Wed, 27 Sep | Lecture on *Arithmetic Expressions - Proof Principles* |
 | Wed, 27 Sep | Exercise session on Project 1 |
-| Wed, 27 Sep | Chapter 4, the Untyped Lambda Calculus |
+| Wed, 27 Sep | Chapter 5, the Untyped Lambda Calculus |
 | Wed, 04 Oct | Lecture on *The Untyped Lambda Calculus (1)* |
 | Wed, 04 Oct | Pen-and-paper exercise session #1 |
 | Wed, 11 Oct | Lecture on *The Untyped Lambda Calculus (2)* |
