@@ -194,29 +194,4 @@ Download for [screen](slides/week14.pdf).
 ### Pen & Paper #1
 
 Download [exercises](slides/penpaper-midterm2016-1.pdf).
-Download [solutions](slides/penpaper-midterm-1-sol.pdf).
 
-### Pen & Paper #2
-
-Download [exercises](slides/penpaper-midterm2021-3.pdf).
-Download [solutions](slides/penpaper-midterm2021-3-sol.pdf).
-
-### Pen & Paper #3
-
-Download [exercises](slides/penpaper-exercises-2022-3.pdf).
-Download [solutions](slides/penpaper-exercises-2022-3-sol.pdf).
-
-
-### Pen & Paper #4
-
-Download [exercises](slides/penpaper-final2022-1.pdf).
-Download [solutions](slides/penpaper-final2022-1-sol.pdf).
-
-### Pen & Paper #5
-
-Download [exercises](slides/penpaper-final2022-2.pdf).
-Download [solutions](slides/penpaper-final2022-2-sol.pdf).
-
-## Homework
-
-Download [the homework statement](slides/homework2022.pdf)
