@@ -29,12 +29,12 @@ Exercise sessions take place on *Wed 11:15-13:00, INJ 218*.
 The schedule below is, to a small extent, still provisional.
 
 |-------------|-----------------------------------------------------------------------------|
-| Wed, 20 Sep | Lecture on *Introduction, Syntax and Operational Semantics* |
+| Wed, 20 Sep | Lecture on *Introduction, Syntax and Operational Semantics*<br />Introduction, all; Arithmetic expressions, 1--32 |
 | Wed, 20 Sep | Exercise session on Project 1 |
-| Wed, 20 Sep | Chapter 3, *especially* sections 3.3 and 3.5 |
-| Wed, 27 Sep | Lecture on *Arithmetic Expressions - Proof Principles* |
+| reading | Chapter 3, *especially* sections 3.3 and 3.5 |
+| Wed, 27 Sep | Lecture on *Arithmetic Expressions - Proof Principles*<br />Arithmetic expressions, 33--51; Untyped lambda calculus 1, 15--33 |
 | Wed, 27 Sep | Exercise session on Project 1 |
-| Wed, 27 Sep | Chapter 5, the Untyped Lambda Calculus |
+| reading | Chapter 5, the Untyped Lambda Calculus |
 | Wed, 04 Oct | Lecture on *The Untyped Lambda Calculus (1)* |
 | Wed, 04 Oct | Pen-and-paper exercise session #1 |
 | Wed, 11 Oct | Lecture on *The Untyped Lambda Calculus (2)* |
