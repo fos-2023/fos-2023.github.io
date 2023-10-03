@@ -193,5 +193,5 @@ Download for [screen](slides/week14.pdf).
 
 ### Pen & Paper #1
 
-Download [exercises](slides/penpaper-midterm2016-1.pdf).
+Download [exercises](slides/penpaper-2023-1.pdf).
 
