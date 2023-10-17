@@ -37,10 +37,13 @@ The schedule below is, to a small extent, still provisional.
 | reading | Chapter 5, the Untyped Lambda Calculus |
 | Tue, 03 Oct | Lecture on *The Untyped Lambda Calculus (1)*<br />Untyped lambda calculus 1, 31--83 |
 | Wed, 04 Oct | Pen-and-paper exercise session #1 |
-| Tue, 10 Oct | Lecture on *The Untyped Lambda Calculus (2)* |
+| reading | Chapter 8, Typed Arithmetic Expressions |
+| Tue, 10 Oct | Lecture on *The Untyped Lambda Calculus (2)*<br />Untyped lambda calculus 2, 1--12, 32--43 (plus Safety for the untyped lambda calculus, board-only) |
 | Wed, 11 Oct | Exercise session on Project 1 and 2 |
+| reading | Chapter 9, Simply Typed Lambda-Calculus |
 | Tue, 17 Oct | Lecture on *The Simply Typed Lambda Calculus* |
 | Wed, 18 Oct | Pen-and-paper exercise session #2 |
+| reading | Chapter 11, Simple Extensions, until 11.7 (Tuples) included |
 | Tue, 24 Oct | Lecture on *STLC & Simple Extensions to STLC* |
 | Wed, 25 Oct | Exercise session on Projects 2 and 3 |
 | Tue, 31 Oct | Lecture on *More Extensions to STLC* |
