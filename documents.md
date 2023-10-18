@@ -195,3 +195,9 @@ Download for [screen](slides/week14.pdf).
 
 Download [exercises](slides/penpaper-2023-1.pdf).
 
+
+
+### Pen & Paper #2
+
+Download [exercises](slides/penpaper-2023-2.pdf).
+
