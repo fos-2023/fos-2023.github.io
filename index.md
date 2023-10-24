@@ -46,6 +46,7 @@ The schedule below is, to a small extent, still provisional.
 | reading | Chapter 11, Simple Extensions, until 11.7 (Tuples) included |
 | Tue, 24 Oct | Lecture on *STLC & Simple Extensions to STLC* |
 | Wed, 25 Oct | Exercise session on Projects 2 and 3 |
+| reading | Chapter 11, Simple Extensions, until the end (pay particular attention to Recursion) |
 | Tue, 31 Oct | Lecture on *More Extensions to STLC* |
 | Wed, 01 Nov | TBA |
 | Tue, 07 Nov | Lecture on *Recursion and State with STLC* |
