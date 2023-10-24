@@ -199,4 +199,5 @@ Download [solutions](slides/penpaper-2023-1-sol.pdf).
 ### Pen & Paper #2
 
 Download [exercises](slides/penpaper-2023-2.pdf).
+Download [solutions](slides/penpaper-2023-2-sol.pdf).
 
