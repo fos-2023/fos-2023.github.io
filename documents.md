@@ -194,8 +194,7 @@ Download for [screen](slides/week14.pdf).
 ### Pen & Paper #1
 
 Download [exercises](slides/penpaper-2023-1.pdf).
-
-
+Download [solutions](slides/penpaper-2023-1-sol.pdf).
 
 ### Pen & Paper #2
 
