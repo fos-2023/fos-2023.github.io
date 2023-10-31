@@ -48,19 +48,20 @@ The schedule below is, to a small extent, still provisional.
 | Wed, 25 Oct | Exercise session on Projects 2 and 3 |
 | reading | Chapter 11, Simple Extensions, until the end (pay particular attention to Recursion) |
 | Tue, 31 Oct | Lecture on *More Extensions to STLC* |
-| Wed, 01 Nov | TBA |
-| Tue, 07 Nov | Lecture on *Recursion and State with STLC* |
+| Wed, 01 Nov | Pen-and-paper exercise session #3 |
+| reading | Chapter 13, References |
+| Tue, 07 Nov | Lecture on *State with STLC* |
 | Wed, 08 Nov | Exercise session on Project 3 |
 | Tue, 14 Nov | Lecture on *Type Reconstruction and Polymorphism* |
 | Wed, 15 Nov | Exercise session on Project 4 |
 | Tue, 21 Nov | Lecture on *Subtyping* |
-| Wed, 22 Nov | Pen-and-paper exercise session #3 |
+| Wed, 22 Nov | Pen-and-paper exercise session #4 |
 | Tue, 28 Nov | Lecture on *Dependent types* |
 | Wed, 29 Nov | Coq workshop |
 | Tue, 05 Dec | Lecture on *Objects* |
 | Wed, 06 Dec | Exercise session on Project 4 and 5 |
 | Tue, 12 Dec | Lecture on *Featherweight Java* |
-| Wed, 13 Dec | Pen-and-paper exercise session #4 |
+| Wed, 13 Dec | Pen-and-paper exercise session #5 |
 | Tue, 19 Dec | Lecture on *Elements of Scala.js IR* |
 | Wed, 20 Dec | Exercise session on Project 5 |
 
