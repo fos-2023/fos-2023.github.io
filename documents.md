@@ -205,3 +205,8 @@ Download [solutions](slides/penpaper-2023-2-sol.pdf).
 
 Download [exercises](slides/penpaper-2023-3.pdf).
 
+
+
+## Homework
+
+Download [the homework statement](slides/homework2023.pdf)
