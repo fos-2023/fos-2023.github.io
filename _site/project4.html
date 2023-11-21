@@ -35,505 +35,346 @@
           
         
           
-        
+            <p><a href="project2.html">Project 2 - Untyped Lambda Calculus</a></p>
           
         
+          
+            <p><a href="project3.html">Project 3 - Simply Typed Lambda Calculus</a></p>
+          
+        
+          
+            <p><a href="project4.html">Project 4 - STLC with Type Reconstruction</a></p>
           
         
           
         
       </header>
       <section>
-        <h1 id="project-4-stlc-extensions">Project 4: STLC Extensions</h1>
+        <h1 id="project-4-stlc-with-type-reconstruction">Project 4: STLC with Type Reconstruction</h1>
 
-<p><strong>Hand in:</strong> 06 Dec 2023, 23:59 (Europe/Zurich)<br /></p>
+<p><strong>Hand in:</strong> 29 Nov 2023, 23:59 (Europe/Zurich)<br />
+<strong>Project template:</strong> <a href="projects/4-inference.zip">4-inference.zip</a></p>
 
-<p><strong>Project template:</strong> <a href="projects/4-extensions.zip">4-extensions.zip</a></p>
+<p>In this exercise, you will write a Hindley-Milner type inferencer for a modification of the simply typed λ-calculus
+with booleans, numbers and <code class="language-plaintext highlighter-rouge">let</code>:</p>
 
-<p>The project skeleton is very similar to the one from the last assignment.
-You should download the template and copy your definitions from the previous project.
-The final submission should contain all extensions, both from this assignment and from the last assignment.
-In this assignment, you will extend your simply typed lambda calculus project from project 3 with several features.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= "true"                            true value
+    | "false"                           false value
+    | numericLit                        integer
+    | "pred" t                          predecessor
+    | "succ" t                          successor
+    | "iszero" t                        iszero
+    | "if" t "then" t "else" t          if
+    | x                                 variable
+    | "\" x [ ":" T ] "." t             abstraction
+    | t t                               application (left associative)
+    | "let" x [ ":" T ] "=" t "in" t    let
+    | "(" t ")"
 
-<p>There is a common base that everyone must implement:</p>
-
-<ul>
-  <li>sum types, and</li>
-  <li>recursive functions (the <code class="language-plaintext highlighter-rouge">fix</code> operator).</li>
-</ul>
-
-<p>In addition, each group must <em>choose one</em> of the following “bundles” of features:</p>
-
-<ul>
-  <li>imperative programming bundle: unit, sequencing and mutable state, or</li>
-  <li>functional programming bundle: tuples, lists and universal types, or</li>
-  <li>subtyping bundle: records and subtyping.</li>
-</ul>
-
-<p>In any case, there is <em>no type reconstruction</em> in this project.</p>
-
-<h2 id="attention-no-grader-feedback-for-the-extensions">Attention! No grader feedback for the extensions</h2>
-
-<p>The automatic tests that you receive from the bot will only test the common base.
-For your chosen bundle, <strong>you must write tests yourselves</strong> to validate that you correctly implemented it.
-Additional testing of the bundles will be done after your final submission.</p>
-
-<h2 id="grading-for-the-bundles">Grading for the bundles</h2>
-
-<p>The grade of this project will be 50% for the common base, and 50% for your bundle.</p>
-
-<p>If you feel adventurous, you may implement <em>several</em> bundles.
-In that case, we will take the <em>highest</em> grade you achieve among the 3 bundles.</p>
-
-<h2 id="built-in-rules-or-derived-forms">Built-in rules or derived forms</h2>
-
-<p>Unless otherwise specified, all the features must be built-in (as opposed to derived forms).</p>
-
-<h2 id="sum-types">Sum Types</h2>
-
-<p>Sum types are handy when one needs to handle heterogeneous collections of values. Imagine you
-have a data type like a tree, where each element can be a leaf (containing a value) or an inner
-node (containing two references to subtrees). A sum type is a type which draws its values from
-exactly two other types. In other words, values of a sum type T1 + T2 can be either of type T1
-or of type T2. We introduce now syntactic rules for sum types, together with evaluation and
-typing rules.</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...                                                terms
-    | "inl" t "as" T                                     inject left
-    | "inr" t "as" T                                     inject right
-    | "case" t "of" "inl" x "=&gt;" t "|" "inr" x "=&gt;" t    case
-
-v ::= ...                                                values
-    | "inl" v "as" T
-    | "inr" v "as" T
-
-T ::= ...                                                types
-    | T "+" T                                            sum type (right assoc.)
+T ::= "Bool"                            boolean type
+    | "Nat"                             numeric type
+    | T "-&gt;" T                          function types  (right associative)
+    | "(" T ")"
 </code></pre></div></div>
 
-<p>We create values of a sum type by injecting a value in the left or right “part”. To deconstruct
-such values, we use a case expression, similar to Scala’s match construct.</p>
+<p>The main difference with the usual STLC is that the type annotations for lambdas and for <code class="language-plaintext highlighter-rouge">let</code> are optional
+(which is expressed by the square brackets around them in the syntax spec).
+This means that the programmer can either explicitly specify types for introduced variables
+or leave them empty to be inferred by the typechecker.</p>
 
-<p>Sum types are right associative and <code class="language-plaintext highlighter-rouge">+</code> has the same precedence as <code class="language-plaintext highlighter-rouge">*</code>.</p>
+<h3 id="type-inference-101">Type Inference 101</h3>
 
-<p>Evaluation rules for sum type extension:</p>
+<p>Unlike the typecheckers in projects #3 and #4 that went top-down on input abstract syntax trees
+and assigned types in one pass, this one is going to be more involved, featuring two phases:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>case (inl v0) of inl x1 =&gt; t1 | inr x2 =&gt; t2  →  [x1 → v0] t1
+<ol>
+  <li>During the first phase, our Hindley-Milner typechecker will recursively collect constraints on the types of expressions present in the input tree.</li>
+  <li>Afterwards in the second phase, it is going to solve these constraints, either producing the resulting type or failing with an error.</li>
+</ol>
 
-case (inr v0) of inl x1 =&gt; t1 | inr x2 =&gt; t2  →  [x2 → v0] t2
+<p>Below we will explain how this works in details, essentially recapping what’s written in TAPL.
+The methodology that has been presented during the lecture on type reconstruction and polymorphism
+is somewhat different, but in fact it talks about exactly the same thing. While implementing the type inferencer,
+take time to understand how both approaches relate to the code that you’re writing,
+because you’ll need to know both on the upcoming exam.</p>
 
-                                   t   →   t'
---------------------------------------------------------------------------------
-case t of inl x1 =&gt; t1 | inr x2 =&gt; t2  →  case t' of inl x1 =&gt; t1 | inr x2 =&gt; t2
+<p><em>You may wonder how what we’re doing is related to the real world. The general notion of type inference
+is very powerful and a lot of languages (C#, Java, C++, F#, Scala, Haskell, Swift, Rust and many others) employ it.
+However, different languages do inference differently, and the most popular approach, called local type inference,
+doesn’t involve anything like Hindley-Milner. Nevertheless, some languages (F# and Haskell among the aforementioned ones)
+employ algorithms that resemble Hindley-Milner, so our project will let you develop useful intuitions.</em></p>
 
+<h3 id="phase-1-collecting-constraints">Phase 1: Collecting constraints</h3>
 
-    t  →  t'
-----------------
-inl t  →  inl t'
+<p><code class="language-plaintext highlighter-rouge">def collect(env: Env, t: Term): (Type, List[Constraint]) = ???</code></p>
 
-    t  →  t'
-----------------
-inr t  →  inr t'
-</code></pre></div></div>
+<p>The basic idea of the first phase is to recursively apply typing rules on the input tree, just as in projects #3/4.
+However, this time the rules are not just <code class="language-plaintext highlighter-rouge">Γ ⊢ t : T</code>, but look like <code class="language-plaintext highlighter-rouge">Γ ⊢ t : T | C</code>, where <code class="language-plaintext highlighter-rouge">C</code> stands for a constraint set.
+Without further ado, here are the typing rules for STLC augmented with constraints (you may want to look into p322 of TAPL
+for a better formatted version):</p>
 
-<p>And lastly new typing rules:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Γ ⊢ true : Bool | {}
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Γ ⊢ t0: T1 + T2    Γ, x1: T1 ⊢ t1: T    Γ, x2: T2 ⊢ t2: T
----------------------------------------------------------
-     Γ ⊢ case t0 of inl x1 =&gt; t1 | inr x2 =&gt; t2: T
+Γ ⊢ false : Bool | {}
 
+Γ ⊢ 0 : Nat | {}
 
-          Γ ⊢ t1: T1
--------------------------------
-Γ ⊢ inl t1 as T1 + T2 : T1 + T2
-
-          Γ ⊢ t1: T2
--------------------------------
-Γ ⊢ inr t1 as T1 + T2 : T1 + T2
-</code></pre></div></div>
-
-<p>Evaluation and typing rules are pretty straightforward, the only thing a bit out of
-ordinary is the type adornment for inl and inr. This is necessary because the two
-constructors can’t possibly know what is the type of the other component of the sum
-type. By giving it explicitly, the type checker is able to proceed. Alternatives to
-this decision will be explored in other exercises, when we know about type inference.</p>
-
-<h2 id="the-fix-operator">The fix operator</h2>
-
-<p>To bring back the fun into the game, we need some way to write non terminating programs
-(or at least, looping programs). Since types arrived, we were unable
-to type the fixpoint operator, and indeed there’s a theorem which states that all well
-typed terms in simply typed lambda calculus evaluate to a normal form. The only
-alternative is to add it into the language.</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...        terms
-    | "fix" t    fixed point of t
-</code></pre></div></div>
-
-<p>New reduction rules:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fix (λx: T1. t2)  →  [x → fix (λx: T1. t2)] t2
-
-    t  →  t'
-----------------
-fix t  →  fix t'
-</code></pre></div></div>
-
-<p>New typing rules:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Γ ⊢ t1: T1 → T1
----------------
-Γ ⊢ fix t1: T1
-</code></pre></div></div>
-
-<p>In order to make the fixpoint operator easier to use, add the following derived form:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>letrec x: T1 = t1 in t2  ⇒  let x = fix (λx: T1. t1) in t2
-</code></pre></div></div>
-
-<p>Don’t forget that we implement let as a derived form as well, so the actual desugaring
-is a bit more complex.</p>
-
-<h2 id="imperative-programming-bundle">Imperative programming bundle</h2>
-
-<p>The imperative programming bundle contains three features:</p>
-
-<ul>
-  <li>The <code class="language-plaintext highlighter-rouge">unit</code> value and its <code class="language-plaintext highlighter-rouge">Unit</code> type, as defined in Section 11.2 (Figure 11-2)</li>
-  <li>Sequencing as defined in Section 11.3 of the book</li>
-  <li>Mutable state with references, as defined in Chapter 13</li>
-</ul>
-
-<p>For mutable references, <em>do not introduce Σ in your <code class="language-plaintext highlighter-rouge">typeof</code> function</em>!
-You do not need to give types to <em>locations</em>, since locations cannot be written in a source program.
-Store typings are only necessary as an artifact of safety proofs, but we are not doing proofs here.</p>
-
-<p>You must, however, introduce μ in your evaluation function, and hence you have to implement the overload of <code class="language-plaintext highlighter-rouge">reduce</code> that manipulates <code class="language-plaintext highlighter-rouge">Store</code>s.</p>
-
-<p>Terms:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...
-    | unit            the unit value
-    | t; t            sequence
-    | ref t           allocate new reference
-    | !t              dereference
-    | t := t          assignment
-    | l               location (but not available in the source program, so not in the parser)
-</code></pre></div></div>
-
-<p>Types:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>T ::= ...
-    | Unit
-    | Ref T
-</code></pre></div></div>
-
-<p>Evaluation rules:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    t1 | μ  →  t1' | μ'
----------------------------
-t1; t2 | μ  →  t1'; t2 | μ'
-
------------------------
-unit; t2 | μ  →  t2 | μ
-
-    t1 | μ  →  t1' | μ'
----------------------------
-ref t1 | μ  →  ref t1' | μ'
-
-      l ∉ dom(μ)
-----------------------------------
-ref v1 | μ  →  l | (μ, l -&gt; v1)
-
- t1 | μ  →  t1' | μ'
----------------------
-!t1 | μ  →  !t1' | μ'
-
-    μ(l) = v
-----------------
-!l | μ  →  v | μ
-
-      t1 | μ  →  t1' | μ'
---------------------------------
-t1 := t2 | μ  →  !t1' := t2 | μ'
-
-      t2 | μ  →  t2' | μ'
---------------------------------
-v1 := t2 | μ  →  !v1 := t2' | μ'
-
+Γ ⊢ t : T | C    C' = C ∪ {T=Nat}
 ---------------------------------
-l := v2 | μ  →  unit | [l -&gt; v2]μ
-</code></pre></div></div>
-
-<p>Typing rules (note that there is no Σ, and no rule for locations):</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---------------
-Γ ⊢ unit : Unit
-
-Γ ⊢ t1 : Unit     Γ ⊢ t2 : T2
------------------------------
-    Γ ⊢ t1; t2 : T2
-
-   Γ ⊢ t1 : T1
--------------------
-Γ ⊢ ref t1 : Ref T1
-
-Γ ⊢ t1 : Ref T1
----------------
-  Γ ⊢ !t1 : T1
-
-Γ ⊢ t1 : Ref T1    Γ ⊢ t2 : T1
-------------------------------
-    Γ ⊢ t1 := t2 : Unit
-</code></pre></div></div>
-
-<h2 id="functional-programming-bundle">Functional programming bundle</h2>
-
-<p>The function programming bundle contains two features:</p>
-
-<ul>
-  <li>Explicit universal types, aka System F, as defined Section 23.3 (Figure 23-1)</li>
-  <li>Records, as defined in Section 11.8 (Figure 11-7)</li>
-  <li>Tuples, like defined in Section 11.7 (Figure 11-6), <em>but as a derived form</em></li>
-  <li>Lists, almost as defined in Section 11.12 (Figure 11-13)</li>
-</ul>
-
-<p>Tuples <em>must</em> desugar into records whose labels are “integer strings”, such as <code class="language-plaintext highlighter-rouge">"1"</code>, <code class="language-plaintext highlighter-rouge">"2"</code>, etc.</p>
-
-<p>As shown by a suggested exercise in the book, <code class="language-plaintext highlighter-rouge">head</code> and <code class="language-plaintext highlighter-rouge">tail</code> are not sound.
-Therefore, we make a few changes compared to the presention in Section 11.12:</p>
-
-<ul>
-  <li>We remove <code class="language-plaintext highlighter-rouge">head</code> and <code class="language-plaintext highlighter-rouge">tail</code></li>
-  <li>We introduce instead a pattern matching construct</li>
-  <li>We remove <code class="language-plaintext highlighter-rouge">isnil</code> because it is redundant</li>
-</ul>
-
-<p>The pattern matching construct is similar to the one for sum types.
-Despite the similarity of the surface syntax, it is truly a different, distinct term shape from the one for sum types.</p>
-
-<p>Terms:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...
-    | "/\" X "." t                                        type abstraction
-    | t "[" T "]"                                         type application
-    | "{" { l "=" t "," } "}"                             record
-    | t "." l                                             record projection
-    | "{" { t "," } "}"                                   tuple (to be desugared)
-    | t "." i                                             tuple projection (to be desugared)
-    | "nil "[" T "]"                                      empty list
-    | "cons "[" T "]" t t                                 list constructor
-    | "case" t "of" "nil" "=&gt;" t "|" "cons" x y "=&gt;" t    list case
-</code></pre></div></div>
-
-<p>We use <code class="language-plaintext highlighter-rouge">{ ... }</code> to denote repetition (0 to many times).
-The last comma is required to simplify the notation of the term syntax here.
-You must at least parse variants with the last comma; you are free to <em>also</em> parse variants without that comma if you want.</p>
-
-<p>Types:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>T ::= ...
-    | X                             type variable
-    | "\/" X "." T                  universal type
-    | "{" { l ":" T "," } "}"       type of records
-    | "{" { Ti "," } "}"            type of tuples (to be desugard)
-    | List T                        type of lists
-</code></pre></div></div>
-
-<p>Evaluation rules:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     t1  →  t1'
---------------------
-t1 [T2]  →  t1' [T2]
-
-(λX: t1) [T2]  →  [X → T2]t1
-
-                        tj  →  tj'
-------------------------------------------------------------
-{li = vi, lj = tj, lk = tk}  →  {li = vi, lj = tj', lk = tk}
-     with i ∈ 1..(j-1) and k ∈ (j+1)..n
-
-  t1  →  t1'
---------------
-t1.l  →  t1'.l
-
-{li = vi}.lj  →  vj
-
-            t1  →  t1'
-----------------------------------
-cons [T] t1 t2  →  cons [T] t1' t2
-
-            t2  →  t2'
-----------------------------------
-cons [T] v1 t2  →  cons [T] v1 t2'
-
-                                  t1   →   t1'
---------------------------------------------------------------------------------
-case t1 of nil =&gt; t2 | cons x y =&gt; t3  →  case t1' of nil =&gt; t2 | cons x y =&gt; t3
-
-case nil of nil =&gt; t2 | cons x y =&gt; t3  →  t2
-
-case (const v0 v1) of nil =&gt; t2 | cons x y =&gt; t3  →  [x → v0] [y → v1] t3
-</code></pre></div></div>
-
-<p>Typing rules:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Γ, X ⊢ t2 : T2
------------------
-Γ ⊢ λX.t2 : ∀X.T2
-
-     Γ ⊢ t1 : ∀X.T1
-------------------------
-Γ ⊢ t1 [T2] : [X → T2]T1
-
-        for each i  Γ ⊢ ti : Ti
------------------------------------------
-Γ ⊢ {l1=t1 ... ln=tn} : {l1:T1 ... ln:Tn}
-
-Γ ⊢ t1 : {l1:T1 ... ln:Tn}
---------------------------
-      Γ ⊢ t1.li : Ti
-
-Γ ⊢ nil [T] : List T
-
-Γ ⊢ t1 : T1     Γ ⊢ t2 : List T1
---------------------------------
-  Γ ⊢ cons [T] t1 t2 : List T2
-
-Γ ⊢ t1 : List T1   Γ ⊢ t2 : T   Γ, x: T1, y: List T1 ⊢ t3 : T
--------------------------------------------------------------
-      Γ ⊢ case t1 of nil =&gt; t2 | cons x y =&gt; t3 : T
-</code></pre></div></div>
-
-<p>Self-check: can you define a <code class="language-plaintext highlighter-rouge">map</code> function in your language?</p>
-
-<p>Further thoughts: could we define <code class="language-plaintext highlighter-rouge">nil</code> and <code class="language-plaintext highlighter-rouge">cons</code> as regular terms with polymorphic types, as suggested in Section 23.4?
-What would be difficult given the structure of our evaluation processor?</p>
-
-<h2 id="subtyping-bundle">Subtyping bundle</h2>
-
-<p>The subtyping bundle contains three features:</p>
-
-<ul>
-  <li>Records, as defined in Section 11.8 (Figure 11-7)</li>
-  <li>Subtyping for records, as defined in selected sections of Chapters 15 and 16 (Figures 15-1, 16-2 and 16-3)</li>
-  <li>Ascription, as defined in Section 11.4 (Figure 11-3)</li>
-</ul>
-
-<p>Note that we use <em>algorithmic subtyping and typing</em>, as presented in Chapter 16.
-We have not seen that in the lectures at the time this project starts (we will see the coming week).
-You may want to skim through Section 16.1 and 16.2, but the rules below recap everything.</p>
-
-<p>The reason we introduce ascription is that it relieves us from having to think about Joins and Meets (see Section 16-3).
-We can instead use ascription to force the two sides of an if-then-else to have the same type.</p>
-
-<p>Terms:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...
-    | "{" { l "=" t "," } "}"       record
-    | t "." l                       projection
-    | t "as" T                      ascription
-</code></pre></div></div>
-
-<p>We use <code class="language-plaintext highlighter-rouge">{ ... }</code> to denote repetition (0 to many times).
-The last comma is required to simplify the notation of the term syntax here.
-You must at least parse variants with the last comma; you are free to <em>also</em> parse variants without that comma if you want.</p>
-
-<p>Types:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>T ::= ...
-    | "{" { l ":" T "," } "}"       type of records
-</code></pre></div></div>
-
-<p>Evaluation rules:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                        tj  →  tj'
-------------------------------------------------------------
-{li = vi, lj = tj, lk = tk}  →  {li = vi, lj = tj', lk = tk}
-     with i ∈ 1..(j-1) and k ∈ (j+1)..n
-
-  t1  →  t1'
---------------
-t1.l  →  t1'.l
-
-{li = vi}.lj  →  vj
-
-     t1  →  t1'
---------------------
-t1 as T  →  t1' as T
-
-v1 as T  →  v1
-</code></pre></div></div>
-
-<p>Subtyping rules:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Nat &lt;: Nat
-
-Bool &lt;: Bool
-
-      {li...} ⊆ {kj...}   for i ∈ 1..n and j ∈ 1..m
-            if kj = li then Sj &lt;: Ti
---------------------------------------------------------
-   {kj: Sj...} &lt;: {li: Ti...}  for i ∈ 1..n and j ∈ 1..m
-
-T1 &lt;: S1     S2 &lt;: T2
----------------------
-  S1 → S2 &lt;: T1 → T2
-</code></pre></div></div>
-
-<p>Typing rules:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Γ ⊢ t1 : T1     T1 = T11 → T12
-Γ ⊢ t2 : T2     T2 &lt;: T11
-------------------------------
-      Γ ⊢ t1 t2 : T12
-
-        for each i  Γ ⊢ ti : Ti
------------------------------------------
-Γ ⊢ {l1=t1 ... ln=tn} : {l1:T1 ... ln:Tn}
-
-Γ ⊢ t1 : R1    R1 = {l1:T1 ... ln:Tn}
+    Γ ⊢ pred t : Nat | C'
+
+Γ ⊢ t : T | C    C' = C ∪ {T=Nat}
+---------------------------------
+    Γ ⊢ succ t : Nat | C'
+
+Γ ⊢ t : T | C    C' = C ∪ {T=Nat}
+---------------------------------
+   Γ ⊢ iszero t : Bool | C'
+
+ Γ ⊢ t1: T1 | C1    Γ ⊢ t2 : T2 | C2
+          Γ ⊢ t3 : T3 | C3
+  C = C1 ∪ C2 ∪ C3 ∪ {T1=Bool, T2=T3}
 -------------------------------------
-          Γ ⊢ t1.li : Ti
+  Γ ⊢ if t1 then t2 else t3 : T2 | C
 
-Γ ⊢ t1 : T1     T1 &lt;: T
------------------------
-    Γ ⊢ t1 as T : T
+   x : T ∈ Γ
+--------------
+Γ ⊢ x : T | {}
+
+   Γ, x : T1 ⊢ t : T2 | C
+-----------------------------
+Γ ⊢ λx: T1. t : T1 -&gt; T2 | C
+
+ Γ, x : X ⊢ t : T2 | C
+      X is fresh
+------------------------
+Γ ⊢ λx. t : X -&gt; T2 | C
+
+ Γ ⊢ t1 : T1 | C1    Γ ⊢ t2 : T2 | C2
+X is fresh, C = C1 ∪ C2 ∪ {T1=T2 -&gt; X}
+--------------------------------------
+        Γ ⊢ t1 t2 : X | C
 </code></pre></div></div>
 
-<h2 id="what-you-need-to-do">What you need to do</h2>
+<p>An interesting thing about the presented typing rules is that they involve type variables. If you take a look at the last rule,
+you will notice that when typechecking applications, we don’t check whether <code class="language-plaintext highlighter-rouge">t1</code> has a function type.
+Instead, we just postulate that it has a function type <code class="language-plaintext highlighter-rouge">T2 -&gt; X</code> for some <code class="language-plaintext highlighter-rouge">X</code> that we’ll infer later.
+Same about typechecking a lambda with an unspecified type of the bound variable.</p>
+
+<p>This is the key insight behind the Hindley-Milner algorithm.
+If you don’t know the type of something immediately by looking at it, you defer typechecking until you know more.
+Amazingly enough, this simple idea is theoretically sound and works really well in practice!</p>
+
+<p>One little remark about theory vs practice. If you compare our rules with the ones given in TAPL, you will notice that we have ignored freshness conditions on type variables: it is necessary that type variables, whenever created, are different from all other type variables in the system. This is easy to achieve when programming the typechecker, and talking about freshness here would only obfuscate the typing rules. However, a formally correct type system needs to include them (and we may ask you to do everything in a formal way during the exam!).</p>
+
+<p>Finally, the most attentive of you guys have probably noticed that the typing rules above don’t mention <code class="language-plaintext highlighter-rouge">let</code>.
+This is not an oversight. <code class="language-plaintext highlighter-rouge">let</code> is a very special case that will be covered later in the document.</p>
+
+<h3 id="intermezzo">Intermezzo</h3>
+
+<p>A fun fact about the type returned by phase 1 is that it’s overly optimistic.
+Whenever the typechecker can’t trivially assign a type to something, it makes up fictional type variables and moves on
+(see the last two typing rules provided above, namely the ones that say “X is fresh”).
+For example, applying phase 1 to <code class="language-plaintext highlighter-rouge">(\b. if b then false else true)</code> will yield the type <code class="language-plaintext highlighter-rouge">X -&gt; Bool</code>
+along with the constraint set that has been generated by the typing rules: <code class="language-plaintext highlighter-rouge">[X = Bool]</code>.</p>
+
+<p>Therefore, in order to complete typechecking, we will need to solve the constraints.
+This is done by a procedure called <em>unification</em>,
+which will tell us two things: A) whether the input is well-typed, B) how to make sense of the type returned by phase 1.</p>
+
+<p>Phase 2 is going to process the constraint set and either produce an error
+or return a <em>substitution</em>, i.e. a mapping from type variables to types
+that can be used to replace type variables in the type returned by phase 1.
+For example, unification of the constraint set <code class="language-plaintext highlighter-rouge">[X = Bool]</code> will yield the substitution <code class="language-plaintext highlighter-rouge">[X → Bool]</code>,
+and applying that substitution to <code class="language-plaintext highlighter-rouge">X -&gt; Bool</code> will produce the resulting type of the example expression:
+<code class="language-plaintext highlighter-rouge">Bool -&gt; Bool</code> (note the arrows that we’re using!).</p>
+
+<h3 id="phase-2-unification">Phase 2: Unification</h3>
+
+<p><code class="language-plaintext highlighter-rouge">def unify(c: List[Constraint]): Substitution = ???</code></p>
+
+<p>The unification algorithm works by starting with an empty substitution <code class="language-plaintext highlighter-rouge">[]</code> and then going through
+the constraints one by one, extending the initial substitution (i.e. adding substitution rules) as it goes.
+Concretely, for every constraint <code class="language-plaintext highlighter-rouge">S = T</code> in the constraint set, the unification algorithm works as follows:</p>
 
 <ol>
   <li>
-    <p>Choose (at least) one bundle to implement. Add to it the sum types and the <code class="language-plaintext highlighter-rouge">fix</code> operator.</p>
+    <p>If <code class="language-plaintext highlighter-rouge">S</code> and <code class="language-plaintext highlighter-rouge">T</code> are the same type, e.g. as in <code class="language-plaintext highlighter-rouge">Nat = Nat</code> or <code class="language-plaintext highlighter-rouge">X1 = X1</code>, then do nothing and proceed to the next constraint.</p>
   </li>
   <li>
-    <p>Implement the <code class="language-plaintext highlighter-rouge">Term</code> parser that recognizes your extended language, using the combinator library.
-The parser must produce abstract syntax trees defined in <code class="language-plaintext highlighter-rouge">Terms.scala</code>.</p>
+    <p>If <code class="language-plaintext highlighter-rouge">S</code> is a type variable, and <code class="language-plaintext highlighter-rouge">S</code> doesn’t appear in <code class="language-plaintext highlighter-rouge">T</code>, extend the resulting substitution with <code class="language-plaintext highlighter-rouge">[S → T]</code> and proceed to the next constraint. If <code class="language-plaintext highlighter-rouge">S</code> appears in <code class="language-plaintext highlighter-rouge">T</code>, then it’s a unification error, because otherwise our algorithm is going to loop infinitely.</p>
+
+    <p>A tricky detail here lies in the necessity to apply <code class="language-plaintext highlighter-rouge">S → T</code> to the remaining constraints in the constraint set.
+ Otherwise, things like <code class="language-plaintext highlighter-rouge">[X = Nat, Y = X]</code> aren’t going to unify in a useful way.</p>
   </li>
   <li>
-    <p>Implement <code class="language-plaintext highlighter-rouge">reduce</code> method which performs one step of the evaluation, according to the
-rules of call-by-value reducer (small step). If none of the rules apply, it should throw
-<code class="language-plaintext highlighter-rouge">NoRuleApplies</code> exception containing corresponding irreducible term.</p>
+    <p>If <code class="language-plaintext highlighter-rouge">T</code> is a type variable, and <code class="language-plaintext highlighter-rouge">S</code> is not, proceed analogously to the previous case.</p>
   </li>
   <li>
-    <p>Implement the <code class="language-plaintext highlighter-rouge">typeof</code> method which, given a term, finds its type. In the case of failure,
-it should throw a <code class="language-plaintext highlighter-rouge">TypeError</code> exception containing the ill-typed term. The ill-typed term
-is the leftmost innermost term that doesn’t typecheck, i.e. that doesn’t have any typing
-rules that apply to it.</p>
+    <p>If <code class="language-plaintext highlighter-rouge">S</code> and <code class="language-plaintext highlighter-rouge">T</code> are both function types, as in <code class="language-plaintext highlighter-rouge">S1 -&gt; S2 = T1 -&gt; T2</code>, recursively unify <code class="language-plaintext highlighter-rouge">S1</code> and <code class="language-plaintext highlighter-rouge">T1</code> as well as <code class="language-plaintext highlighter-rouge">S2</code> and <code class="language-plaintext highlighter-rouge">T2</code>, and proceed to the next constraint.</p>
   </li>
   <li>
-    <p>Do not forget to write tests for your chosen bundle.</p>
+    <p>Else fail. This means that it’s impossible to find a substitution that satisfies the constraint set, which ultimately means a type error.</p>
   </li>
 </ol>
 
-<p><strong>Hint</strong>: re-using code from previous assignments might be a good idea.</p>
+<h3 id="the-elephant-in-the-room">The elephant in the room…</h3>
 
-<h2 id="development--debugging">Development &amp; debugging</h2>
+<p>By now, you’re probably wondering what’s so special about <code class="language-plaintext highlighter-rouge">let</code> that we’ve been ignoring it all this time.
+After all, <code class="language-plaintext highlighter-rouge">let</code> trivially desugars to an application of a lambda, right?</p>
 
-<p>Since the project skeleton is the same as in the previous assignment, everything from
-the “Development &amp; debugging” section in <a href="project3.html">the previous project description</a>
-applies to this project as well.</p>
+<p>Well, in fact there’s nothing special about <code class="language-plaintext highlighter-rouge">let</code> as a language construct -
+we’re just going to use it as a hack to encode special behavior into the typechecking algorithm.</p>
+
+<h3 id="and-the-dirty-secrets-of-language-designers">…and the dirty secrets of language designers</h3>
+
+<p>Let’s recap the current situation. We have a very neat algorithm that lets us completely drop type annotations
+from lambdas and have these annotations inferred. Now instead of writing:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>double = \f: Bool -&gt; Bool. \x: Bool. f(f(x))
+double (\x: Bool. if x then true else false) false
+</code></pre></div></div>
+
+<p>We can write <code class="language-plaintext highlighter-rouge">double = \f.\x.f(f(x)); double (\x.if x then true else false) false</code>
+(please bear with my imaginary syntax) thanks to <em>type inference</em>, which is definitely a useful language feature.</p>
+
+<p>However, our language is definitely not cool enough, because there’s another cool feature
+that’s called <em>polymorphism</em>. If our language had polymorphism, we would be able to write
+the following code, using the function <code class="language-plaintext highlighter-rouge">double</code> polymorphically, i.e. being able to run the same code
+in different contexts:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>double = \f.\x. f(f(x))
+if (double (\x. if x then false else true) false)
+then double (\x. succ x) 0
+else 0
+</code></pre></div></div>
+
+<p>Unfortunately, our type inference algorithm can’t handle such a program, because the first usage of <code class="language-plaintext highlighter-rouge">double</code>
+will add <code class="language-plaintext highlighter-rouge">X = Nat</code> to the constraint set (where <code class="language-plaintext highlighter-rouge">X</code> is a type variable introduced for <code class="language-plaintext highlighter-rouge">x</code>),
+whereas the second usage will add <code class="language-plaintext highlighter-rouge">X = Bool</code> to the constraint, and we’ll get a contradiction during unification.</p>
+
+<p>Now, as language designers, we can’t resist a possibility to make our language more powerful.
+We’re going to take an existing language feature, <code class="language-plaintext highlighter-rouge">let</code>, and repurpose it to exhibit the semantics
+that we’re currently fond of. As a result, our calculus will become more complicated, our implementation
+will become more complicated, and you will have to understand and implement all that.
+But hey - it’s gotta be fun!</p>
+
+<h3 id="a-boring-tldr-of-the-previous-section">A boring tl;dr of the previous section</h3>
+
+<p>Our calculus is really neat, but it’s not cool enough. Therefore, we’re going to incorporate
+a new feature into it, and we need a dedicated language construct to express that feature.
+We don’t want to introduce new language features, so we’ll take <code class="language-plaintext highlighter-rouge">let</code> and make it mean something else.</p>
+
+<h3 id="let-polymorphism">Let-polymorphism</h3>
+
+<p>The way to incorporate polymorphism into typechecking <code class="language-plaintext highlighter-rouge">let</code> is to generalize the type of <code class="language-plaintext highlighter-rouge">double</code> by making it a <em>type scheme</em>. A type scheme is a recipe for creating types, and it works by abstracting over its type variables. Each time <code class="language-plaintext highlighter-rouge">double</code> is used, we instantiate the type scheme to yield a new type, which means that type variables participating in the constraints aren’t going to contradict each other.</p>
+
+<p>A <em>type scheme</em> is: 1) a type, together with 2) a list of type variables that can be instantiated. Instantiation means inventing fresh type variables for each of the arguments of a type scheme, and substituting them with the fresh ones. For example, <code class="language-plaintext highlighter-rouge">TypeScheme(List(a), a -&gt; a)</code> instantiates to <code class="language-plaintext highlighter-rouge">a1 -&gt; a1</code>, and that’s how we’ll be able to avoid contradicting constraints.</p>
+
+<p>To accommodate this intuition, we do the following four steps:</p>
+
+<ol>
+  <li>
+    <p>Change <code class="language-plaintext highlighter-rouge">Г</code>. Previously, the environment contained mappings from names to types, but now it is going to contain mappings from names to type schemes. Each time we lookup a variable in the environment, we instantiate its type scheme and return the result of instantiation.</p>
+  </li>
+  <li>
+    <p>Change the typing rules for lambdas. Instead of binding names to types, these rules are now going to bind names to boring type schemes with empty lists of type variables. Nothing essential changes here - we’re just trivially generalizing the old rules.</p>
+  </li>
+  <li>
+    <p>Do not change other existing typing rules. The remaining rules don’t modify <code class="language-plaintext highlighter-rouge">Г</code>, so we don’t need to do anything with them.</p>
+  </li>
+  <li>
+    <p>Introduce a new typing rule that handles <code class="language-plaintext highlighter-rouge">let x = v in t</code> (a typing rule for <code class="language-plaintext highlighter-rouge">let x: T = v in T</code> doesn’t change from project #3). Here’s an implementation sketch (consult chapter 22.7 of TAPL for a detailed explanation):</p>
+
+    <ol>
+      <li>
+        <p>We type the right hand side <code class="language-plaintext highlighter-rouge">v</code> obtaining a type <code class="language-plaintext highlighter-rouge">S</code> and a set of constraints <code class="language-plaintext highlighter-rouge">C</code>.</p>
+      </li>
+      <li>
+        <p>We use unification on <code class="language-plaintext highlighter-rouge">C</code> and apply the result to <code class="language-plaintext highlighter-rouge">S</code> to find its first approximation as type. At this point, the substitution we found should be applied to the current environment too, since we have committed to a set of bindings between type variables and types! Let’s call this new type <code class="language-plaintext highlighter-rouge">T</code></p>
+      </li>
+      <li>
+        <p>We generalize some type variables inside <code class="language-plaintext highlighter-rouge">T</code> and obtain a type scheme.</p>
+
+        <p><em>Important:</em> We need to be careful about what type variables we generalize. We should not generalize any type variables appearing in the environment, because they appear in constraints that need to be satisfied. For example:</p>
+
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> (\f.\x. let g = f in g(0)) (\x.if x then false else true) true
+</code></pre></div>        </div>
+
+        <p>While typing <code class="language-plaintext highlighter-rouge">let</code>, the environment will contain bindings such as <code class="language-plaintext highlighter-rouge">[f -&gt; X1, g -&gt; X2]</code> and some constraints on them, like { <code class="language-plaintext highlighter-rouge">X1 = Bool -&gt; Bool</code> }. Notice inside <code class="language-plaintext highlighter-rouge">let</code> we use <code class="language-plaintext highlighter-rouge">g</code> as a function on <code class="language-plaintext highlighter-rouge">Nat</code> and that should be a constraint on <code class="language-plaintext highlighter-rouge">f</code> too, which is an argument of the function. Applying this function to <code class="language-plaintext highlighter-rouge">Bool</code> should fail. If we wrongly generalize, we would get a <code class="language-plaintext highlighter-rouge">TypeScheme(X1, X1)</code> for <code class="language-plaintext highlighter-rouge">g</code> which would be instantiated at use to <code class="language-plaintext highlighter-rouge">X3</code>, which would be constrained to be a function on <code class="language-plaintext highlighter-rouge">Nat</code>. Notice how this constraint will not involve the <code class="language-plaintext highlighter-rouge">X1</code> anymore, and the typechecker would miss the type error! The bottom line is, generalizing type <code class="language-plaintext highlighter-rouge">T</code> to a type scheme should only abstract type variables that don’t appear in the current environment.</p>
+      </li>
+      <li>
+        <p>We extend the environment with a binding from <code class="language-plaintext highlighter-rouge">x</code> to its type scheme.</p>
+      </li>
+      <li>
+        <p>We typecheck <code class="language-plaintext highlighter-rouge">t</code> with the new environment.</p>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<h3 id="what-you-have-to-do">What you have to do</h3>
+
+<ol>
+  <li>
+    <p>Implement <code class="language-plaintext highlighter-rouge">collect</code> aka phase 1 of the Hindley-Milner typechecking algorithm
+with support for the entire language explained above, including <code class="language-plaintext highlighter-rouge">let</code>.</p>
+  </li>
+  <li>
+    <p>Implement <code class="language-plaintext highlighter-rouge">unify</code> aka phase 2 of the Hindley-Milner typechecking algorithm,
+again for the whole language. If you encounter an error during unification,
+throw a <code class="language-plaintext highlighter-rouge">TypeError</code> exception.</p>
+  </li>
+</ol>
+
+<h3 id="implementation-hints">Implementation hints</h3>
+
+<ul>
+  <li>
+    <p>In this project template, you will be given a working parser, so don’t worry about parsing at all.
+We’re also not interested in evaluation, just in typechecking, so you don’t need to implement an evaluator either.</p>
+  </li>
+  <li>
+    <p>You can start small by implementing the initial typing rules that don’t include <code class="language-plaintext highlighter-rouge">let</code> and
+extending the environment with trivial type schemes where necessary.
+Our tests will check your progress at this stage, allowing you to make sure your initial implementation is okay before moving on to <code class="language-plaintext highlighter-rouge">let</code>.</p>
+  </li>
+  <li>
+    <p>While coding the assignment, only change <code class="language-plaintext highlighter-rouge">Infer.scala</code> and
+do not change names or signatures of any public methods or classes.
+If you do otherwise, your submission may fail to compile.</p>
+  </li>
+</ul>
+
+<h3 id="development-and-debugging">Development and debugging</h3>
+
+<p>We provide a simple runnner for your application that lets you quickly debug your current implementation. When you implement <code class="language-plaintext highlighter-rouge">collect</code> and <code class="language-plaintext highlighter-rouge">unify</code>, it should produce results like:</p>
+
+<p><strong>Example 1</strong>:</p>
+
+<p>input:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>\b. if b then false else true
+</code></pre></div></div>
+
+<p>output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typed: (Bool -&gt; Bool)
+</code></pre></div></div>
+
+<p><strong>Example 2</strong>:</p>
+
+<p>input:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>\b. if b then 1 else true
+</code></pre></div></div>
+
+<p>output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>type error: Could not unify: Nat with Bool
+</code></pre></div></div>
+
+<p>As usual, we won’t be grading you on the format of console output, your style of prettyprinting or the exact content of your error messages. All examples here are purely illustratory.</p>
 
       </section>
     </div>

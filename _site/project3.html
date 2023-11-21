@@ -35,9 +35,15 @@
           
         
           
-        
+            <p><a href="project2.html">Project 2 - Untyped Lambda Calculus</a></p>
           
         
+          
+            <p><a href="project3.html">Project 3 - Simply Typed Lambda Calculus</a></p>
+          
+        
+          
+            <p><a href="project4.html">Project 4 - STLC with Type Reconstruction</a></p>
           
         
           
@@ -53,7 +59,7 @@
 <p>The goal of this exercise is to familiarize yourself with the simply typed λ-calculus; your work consists of implementing a type
 checker and a reducer for simply typed λ-terms. To make it more interesting, we extend λ-calculus with boolean and
 integer values, as well as let and pair constructs. This time we’ll fix a call-by-value strategy, so there will be only one reducer you need to write (actually,
-you can reuse some of the reducer from the previous assignment.</p>
+you can reuse some of the reducer from the previous assignment).</p>
 
 <p>We first introduce the syntax for typed λ-calculus without <em>let</em> and <em>pairs</em>, which we’ll add later. It might be a good
 idea to start implementing this language first and later add the rest. The syntax is presented here:</p>
@@ -90,11 +96,16 @@ types:</p>
     | "Nat"                       numeric type
     | T "-&gt;" T                    function types  (right associative)
     | "(" T ")"
+    | singleLetterIdent           uninterpreted types, e.g., "A"
 </code></pre></div></div>
 
-<p>There are three kinds of types in this language: booleans, natural numbers and function types. The type constructor “→” is
+<p>There are three kinds of concrete types in this language: booleans, natural numbers and function types. The type constructor “→” is
 right-associative – that is, the expression <code class="language-plaintext highlighter-rouge">T</code><sub><code class="language-plaintext highlighter-rouge">1</code></sub><code class="language-plaintext highlighter-rouge"> → T</code><sub><code class="language-plaintext highlighter-rouge">2</code></sub><code class="language-plaintext highlighter-rouge"> → T</code><sub><code class="language-plaintext highlighter-rouge">3</code></sub> stands for
 <code class="language-plaintext highlighter-rouge">T</code><sub><code class="language-plaintext highlighter-rouge">1</code></sub><code class="language-plaintext highlighter-rouge"> → (T</code><sub><code class="language-plaintext highlighter-rouge">2</code></sub><code class="language-plaintext highlighter-rouge"> → T</code><sub><code class="language-plaintext highlighter-rouge">3</code></sub><code class="language-plaintext highlighter-rouge">)</code> [TAPL, p.100].</p>
+
+<p>It also supports “uninterpreted” types such as <code class="language-plaintext highlighter-rouge">A</code>, <code class="language-plaintext highlighter-rouge">B</code>, <code class="language-plaintext highlighter-rouge">C</code>.
+There is no way to actually construct a <em>value</em> of such types.
+They can be useful to use STLC as a proof system for logic propositions, using the Curry-Howard correspondance.</p>
 
 <h2 id="evaluation-rules">Evaluation rules</h2>
 
@@ -206,11 +217,11 @@ of its evaluation will be a value.</p>
     | "let" x ":" T "=" t "in" t
 </code></pre></div></div>
 
-<p>We can define <code class="language-plaintext highlighter-rouge">let</code> in terms of the existing concepts, and this has the advantage that once the translation (also called “desugaring”) is done in the parser, no addition
+<p>We can define <code class="language-plaintext highlighter-rouge">let</code> in terms of the existing concepts, and this has the advantage that once the translation (also called “desugaring”) is done, no addition
 is necessary to the type checker or to the evaluator. Such an addition is called a derived form. The language that is accepted by our parser
-is called external language and the language understood by the evaluator (and type checker) is called internal language.</p>
+is called the external language and the language understood by the evaluator (and type checker) is called the internal language.</p>
 
-<p><em>Desugaring of derived forms is very convenient from a scientific point of view (so much that it’s become a de facto standard in literature). However, careless desugaring in a practical compiler invites trouble. As our experience with scalac shows, performing desugarings during parsing is not a very good idea, because it: 1) confuses tools, e.g. hyperlinking in IDEs, 2) makes prettyprinting and error messages less helpful, 3) complicates compiler extensibility. In this toy project, you’ll desugar in parser, because it’s really simple to implement, but we would also like you to understand the associated trade-offs.</em></p>
+<p><em>Desugaring of derived forms is very convenient from a scientific point of view (so much that it’s become a de facto standard in literature). However, careless desugaring in a practical compiler invites trouble. As our experience with scalac shows, performing desugarings during parsing is not a very good idea, because it: 1) confuses tools, e.g. hyperlinking in IDEs, 2) makes prettyprinting and error messages less helpful, 3) complicates compiler extensibility. In this toy project, you will desugar terms before typechecking, because it’s really simple to implement, but we would also like you to understand the associated trade-offs.</em></p>
 
 <p>Now, without further ado, let’s see the
 translation of let in terms of abstraction and application:</p>
@@ -220,7 +231,7 @@ translation of let in terms of abstraction and application:</p>
 
 <h2 id="adding-pairs-the-hard-way">Adding <em>pairs</em> the hard way</h2>
 
-<p>To add pairs, we can’t do the same trick, because there are no existing language features to piggyback onto, so we’ll need to extends the existing syntax, evaluation and typing rules:</p>
+<p>To add pairs, we can’t do the same trick, because there are no existing language features to piggyback onto, so we’ll need to extend the existing syntax, evaluation and typing rules:</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t ::= ...
     | "{" t "," t "}"
@@ -234,8 +245,9 @@ T ::= ...
      | T "*" T                    (right associative)
 </code></pre></div></div>
 
-<p>The first form creates a new pair, and the other two are called projections, and extract the first and the second element of a pair. We add
-a new kind of values, pair values, and a new kind of type, for the corresponding pair type. We decide that the pair type constructor
+<p>The first form creates a new pair.
+The other two are called projections, and extract the first and the second element of a pair, respectively.
+We add a new kind of values, pair values, and a new kind of type, for the corresponding pair type. We decide that the pair type constructor
 (denoted by <code class="language-plaintext highlighter-rouge">*</code>) takes precedence over the arrow constructor, so <code class="language-plaintext highlighter-rouge">Nat * Nat → Bool</code> is parsed as <code class="language-plaintext highlighter-rouge">(Nat * Nat) → Bool</code>, and that function application takes precedence over projections so <code class="language-plaintext highlighter-rouge">snd x y</code> is parsed as <code class="language-plaintext highlighter-rouge">snd (x y)</code>.
 The new evaluation rules are presented below:</p>
 
@@ -279,13 +291,19 @@ snd t → snd t'
 
 <ol>
   <li>
-    <p>Implement <code class="language-plaintext highlighter-rouge">Term</code> parser that recognizes this language, using the combinator library. The parser must produce abstract syntax trees defined in <code class="language-plaintext highlighter-rouge">Terms.scala</code>.</p>
+    <p>Implement the <code class="language-plaintext highlighter-rouge">desugar</code> method, which performs desugaring of the <code class="language-plaintext highlighter-rouge">let</code> syntax. It should produce a term that is not a <code class="language-plaintext highlighter-rouge">Let</code> term, nor contain any <code class="language-plaintext highlighter-rouge">Let</code> sub-term.</p>
   </li>
   <li>
-    <p>Implement <code class="language-plaintext highlighter-rouge">reduce</code> method which performs one step of the evaluation, according to the rules of call-by-value reducer (small step). If none of the rules apply, it should throw <code class="language-plaintext highlighter-rouge">NoRuleApplies</code> exception containing corresponding irreducible term.</p>
+    <p>Implement the <code class="language-plaintext highlighter-rouge">reduce</code> method, which performs one step of the evaluation, according to the rules of call-by-value reducer (small step). If none of the rules apply, it should throw <code class="language-plaintext highlighter-rouge">NoRuleApplies</code> exception containing the corresponding irreducible term.</p>
   </li>
   <li>
-    <p>Implement <code class="language-plaintext highlighter-rouge">typeof</code> method which given a term finds its type. In the case of failure, it should throw <code class="language-plaintext highlighter-rouge">TypeError</code> exception containing the ill-typed term. The ill-typed term is the leftmost innermost term that doesn’t typecheck, i.e. that doesn’t have any typing rules that apply to it.</p>
+    <p>Implement the <code class="language-plaintext highlighter-rouge">typeof</code> method, which given a context and a term finds its type. In the case of failure, it should throw a <code class="language-plaintext highlighter-rouge">TypeError</code> exception containing the ill-typed term. The ill-typed term is the leftmost innermost term that doesn’t typecheck, i.e., that doesn’t have any typing rules that apply to it.</p>
+  </li>
+  <li>
+    <p>Implement the <code class="language-plaintext highlighter-rouge">curryHowardProof</code> method. It should return a “proof” of the logic proposition <code class="language-plaintext highlighter-rouge">((A ∧ B) ⊃ C) ⊃ (A ⊃ (B ⊃ C))</code> using the Curry-Howard correspondance. First manually translate that proposition into a type, then find a term of that type. The <code class="language-plaintext highlighter-rouge">curryHowardProof</code> must return a (constant) string that parses as that term.</p>
+  </li>
+  <li>
+    <p>(Optional further thoughts:) can you come up with additional typing rule(s) for the <code class="language-plaintext highlighter-rouge">let</code> syntax without desugaring? Consider implementing it, and verify that for any term <code class="language-plaintext highlighter-rouge">t</code>, <code class="language-plaintext highlighter-rouge">typeof(Nil, t)</code> behaves the same as <code class="language-plaintext highlighter-rouge">typeof(Nil, desugar(t))</code>. Can you do something similar for <code class="language-plaintext highlighter-rouge">reduce</code> as well?</p>
   </li>
 </ol>
 

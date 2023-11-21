@@ -35,9 +35,15 @@
           
         
           
-        
+            <p><a href="project2.html">Project 2 - Untyped Lambda Calculus</a></p>
           
         
+          
+            <p><a href="project3.html">Project 3 - Simply Typed Lambda Calculus</a></p>
+          
+        
+          
+            <p><a href="project4.html">Project 4 - STLC with Type Reconstruction</a></p>
           
         
           
@@ -178,6 +184,15 @@ t1 t2 → t1 t2'
   </li>
   <li>
     <p>Implement <code class="language-plaintext highlighter-rouge">reduceCallByValue</code> method that uses the call-by-value evaluation strategy. For that you need to define a new set of evaluation rules, similar to the ones given above. Again, if none of the rules apply it should throw <code class="language-plaintext highlighter-rouge">NoReductionPossible</code> exception containing corresponding irreducible term.</p>
+  </li>
+  <li>
+    <p>Implement the <code class="language-plaintext highlighter-rouge">programGCD</code> method.
+It must return a (constant) string that represents a program.
+The program must evaluate to an abstraction value.
+When applied to two Church numerals <code class="language-plaintext highlighter-rouge">a</code> and <code class="language-plaintext highlighter-rouge">b</code> as arguments, that function must return another Church numeral that represents the greatest common divisor (GCD) of <code class="language-plaintext highlighter-rouge">a</code> and <code class="language-plaintext highlighter-rouge">b</code>.
+For example, if applied to <code class="language-plaintext highlighter-rouge">c4</code> and <code class="language-plaintext highlighter-rouge">c6</code>, it must return a Church numeral that behaves like <code class="language-plaintext highlighter-rouge">c2</code>.
+Use the functional variant of the Euclidian algorithm to compute <code class="language-plaintext highlighter-rouge">gcd(a, b)</code>: it is defined as <code class="language-plaintext highlighter-rouge">gcd(a, b) = if b == 0 then a else gcd(b, mod(a, b))</code>.
+We give you a template with all the “standard” lambda-terms that you already used in the exercise last week; feel free to define additional helpers.</p>
 
     <p>Since we speak about values, we need to define what a value is. We will follow the book in saying that the only values are lambda abstractions. Does it simplify the substitution operation? What would happen if we add variables to the set of values (do not implement, these are self-check questions)? Compare the output of the two reducers, and try to understand why it is different.</p>
   </li>
