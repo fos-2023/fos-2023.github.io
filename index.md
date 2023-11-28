@@ -52,16 +52,22 @@ The schedule below is, to a small extent, still provisional.
 | reading | Chapter 13, References |
 | Tue, 07 Nov | Lecture on *State with STLC* |
 | Wed, 08 Nov | Exercise session on Project 3 |
+| reading | Chapter 22 -- Type Reconstruction -- But do not pay too much attention to the 𝓧 sets. |
 | Tue, 14 Nov | Lecture on *Type Reconstruction and Polymorphism* |
 | Wed, 15 Nov | Exercise session on Project 4 |
+| reading | Chapter 15 -- Subtyping, up to section 15.5 included -- Chapter 16 -- Metatheory of subtyping. |
 | Tue, 21 Nov | Lecture on *Subtyping* |
 | Wed, 22 Nov | Pen-and-paper exercise session #4 |
+| reading | Chapter 29 -- Type Operators and Kinding -- Chapter 30 -- Higher-Order Polymorphism, but without the proofs. |
 | Tue, 28 Nov | Lecture on *Dependent types* |
 | Wed, 29 Nov | Exercise session on Project 4 and 5 |
+| reading | Chapter 18 -- Case Study: Imperative Objects. |
 | Tue, 05 Dec | Lecture on *Objects* |
 | Wed, 06 Dec | Coq workshop |
+| reading | Chapter 19: Case Study: Featherweight Java. |
 | Tue, 12 Dec | Lecture on *Featherweight Java* |
 | Wed, 13 Dec | Pen-and-paper exercise session #5 |
+| reading | No reading this week. |
 | Tue, 19 Dec | Lecture on *Elements of Scala.js IR* |
 | Wed, 20 Dec | Exercise session on Project 5 |
 
