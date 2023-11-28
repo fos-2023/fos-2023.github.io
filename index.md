@@ -57,9 +57,9 @@ The schedule below is, to a small extent, still provisional.
 | Tue, 21 Nov | Lecture on *Subtyping* |
 | Wed, 22 Nov | Pen-and-paper exercise session #4 |
 | Tue, 28 Nov | Lecture on *Dependent types* |
-| Wed, 29 Nov | Coq workshop |
+| Wed, 29 Nov | Exercise session on Project 4 and 5 |
 | Tue, 05 Dec | Lecture on *Objects* |
-| Wed, 06 Dec | Exercise session on Project 4 and 5 |
+| Wed, 06 Dec | Coq workshop |
 | Tue, 12 Dec | Lecture on *Featherweight Java* |
 | Wed, 13 Dec | Pen-and-paper exercise session #5 |
 | Tue, 19 Dec | Lecture on *Elements of Scala.js IR* |
