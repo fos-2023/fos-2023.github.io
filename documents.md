@@ -213,6 +213,12 @@ Download [exercises](slides/penpaper-2023-4.pdf).
 
 
 
+### Pen & Paper #5
+
+Download [exercises](slides/penpaper-2023-5.pdf).
+
+
+
 ## Homework
 
 Download [the homework statement](slides/homework2023.pdf)
