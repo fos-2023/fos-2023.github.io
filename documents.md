@@ -204,8 +204,7 @@ Download [solutions](slides/penpaper-2023-2-sol.pdf).
 ### Pen & Paper #3
 
 Download [exercises](slides/penpaper-2023-3.pdf).
-
-
+Download [solutions](slides/penpaper-2023-3-sol.pdf).
 
 ### Pen & Paper #4
 
